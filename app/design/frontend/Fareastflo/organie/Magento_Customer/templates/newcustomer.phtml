@@ -1,0 +1,505 @@
+<?php
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * New Customer block template
+ *
+ * @var $block \Magento\Customer\Block\Form\Login\Info
+ * @var $block \Smartosc\Customer\Block\Form\Login\Info
+ */
+?>
+<?php
+$formData = $block->getFormData();
+$firstName = $formData->getData('firstname');
+$lastName = $formData->getData('lastname');
+$prefix = $formData->getData('prefix');
+$customerHelper = $this->helper('\Smartosc\Customer\Helper\Data');
+$countryList = $customerHelper->getCountryCodeOptions();
+?>
+<?php
+$current_year = date("Y");
+$current_year = (int)$current_year;
+$dob = null;
+$validate = 'data-validate="{&quot;required&quot;:true}""';
+
+?>
+
+<?php if ($block->getRegistration()->isAllowed()): ?>
+<div class="block block-new-customer">
+    <div class="block-title">
+		<h3 class="title" id="block-new-customer-heading" role="heading" aria-level="2"><span><?php /* @escapeNotVerified */ echo __('New Customers') ?></span></h3>
+    </div>
+    <div class="block-content" aria-labelledby="block-new-customer-heading">
+        <p><?php /* @escapeNotVerified */ echo __('Creating an account has many benefits: check out faster, keep more than one address, track orders and more.') ?></p>
+        <div class="actions-toolbar" style="display: none;">
+            <div class="primary">
+                <a href="<?php /* @escapeNotVerified */ echo $block->getCreateAccountUrl() ?>" class="action create primary btn btn-default btn-lg"><span><?php /* @escapeNotVerified */ echo __('Create an Account') ?></span></a>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<form class="form create account form-create-account" action="<?php /* @escapeNotVerified */
+echo $block->getPostActionUrl() ?>" method="post" id="form-validate" enctype="multipart/form-data"
+      autocomplete="off">
+
+    <?php echo $block->getBlockHtml('formkey'); ?>
+
+    <fieldset class="fieldset create info" id="fieldset-create-info">
+
+        <div class="block-title">
+            <h3 class="title"><span><?php /* @escapeNotVerified */ echo __('Personal Information') ?></span></h3>
+        </div>
+
+        <input type="hidden" name="success_url" value="<?php /* @escapeNotVerified */ echo $block->getSuccessUrl() ?>">
+        <input type="hidden" name="error_url" value="<?php /* @escapeNotVerified */ echo $block->getErrorUrl() ?>">
+
+        <?php echo $block->getLayout()->createBlock('Magento\Customer\Block\Widget\Name')->toHtml() ?>
+
+        <label for="dob" class="label">
+            <span class="has-tooltip"><?php /* @escapeNotVerified */ echo __('Date of birth*') ?>:</span>
+            <div class="tooltip-icon fa-question-circle">
+                <div class="tooltip-text"><p><?php echo __($customerHelper->getDobTooltipLabel()) ?></p></div>
+            </div>
+
+        </label>
+        <div class="field dob customer-dob">
+            <input type="hidden" class="" value="<?php echo $dob; ?>" id="dob" name="dob" autocomplete="off">
+            <div class="date-time">
+                <div class="dob-day">
+                    <select id="dob_dd" name="day" title="<?php /* @escapeNotVerified */ echo __('DD') ?>" <?php echo $validate;?>>
+                        <option value=""><?php /* @escapeNotVerified */ echo __('DD') ?></option>
+                        <?php for($day=1;$day<=31;$day++):?>
+                            <option value="<?php /* @escapeNotVerified */ echo __($day) ?>" ><?php /* @escapeNotVerified */ echo __($day) ?></option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
+                <div class="dob-month">
+                    <select id="dob_mm" name="month" title="<?php /* @escapeNotVerified */ echo __('MM') ?>" <?php echo $validate;?>>
+                        <option value=""><?php /* @escapeNotVerified */ echo __('MM') ?></option>
+                        <?php for($month=1;$month<=12;$month++):?>
+                            <option value="<?php /* @escapeNotVerified */ echo __($month) ?>" ><?php /* @escapeNotVerified */ echo __($month) ?></option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
+                <div class="dob-year">
+                    <select id="dob_yy" name="year" title="<?php /* @escapeNotVerified */ echo __('YYYY') ?>" <?php echo $validate;?>>
+                        <option value=""><?php /* @escapeNotVerified */ echo __('YYYY') ?></option>
+                        <?php for($year=1950;$year<=$current_year;$year++):?>
+                            <option value="<?php /* @escapeNotVerified */ echo __($year) ?>" ><?php /* @escapeNotVerified */ echo __($year) ?></option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
+            </div>
+            <input type="text" data-validate="{'validate-date-dob':true, 'validate-dob': true}" id="dob-validate" name="dob-validate" autocomplete="off">
+        </div>
+
+        <div class="row">
+            <div class="offset3 span3 contact_number">
+                <div class="form-group">
+                    <label class="label" for="volume">
+                        <span><?php /* @escapeNotVerified */ echo __('Mobile Number*') ?>:</span>
+                        <div class="tooltip-icon fa-question-circle">
+                            <div class="tooltip-text"><p><?php echo __($customerHelper->getContactNumberTooltipLabel()) ?></p></div>
+                        </div>
+                    </label>
+                    <div class="controls">
+                        <div class="input-append">
+                            <?php $countryList = $customerHelper->getCountryCodeOptions();?>
+                            <select id="contact_number" name="contact_number" data-validate="{'validate-select':true}" aria-required="true">
+                                <?php foreach ($countryList as $countryOption): ?>
+                                    <option value="<?php echo $countryOption['country_code']?>" <?php if($countryOption['value'] == "SG" ){echo "selected";}?> >+<?php echo $countryOption['country_code']?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <input type="text" class="input-text" id="contact_number_1" placeholder="<?php /* @escapeNotVerified */ echo __('Mobile Number') ?> "  data-validate="{required: true}" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <?php $_streetValidationClass = $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('street'); ?>
+        <?php
+        $streetName = '';
+        if (!empty($street = $block->getFormData()->getData('street')))
+        {
+            if (is_array($street)) {
+                $streetName = reset($street);
+            } else {
+                $streetName = $street;
+            }
+        }
+        ?>
+        <div class="field street required">
+            <div class="control">
+                <div class="form-group">
+                    <input type="text" placeholder="<?php /* @escapeNotVerified */ echo __('Street Address') ?>" name="street[]" value="<?php echo $streetName ?>" title="<?php /* @escapeNotVerified */ echo __('Street Address') ?>" id="street_1" class="input-text <?php /* @escapeNotVerified */ echo $_streetValidationClass ?>" required/>
+                    <label class="label" for="street_1"><span><?php /* @escapeNotVerified */ echo __('Street Address') ?></span></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="field city col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    <div class="control">
+                        <input type="text" value="<?php echo $block->getFormData()->getData('floor');?>" placeholder="<?php /* @escapeNotVerified */ echo __('Floor/Unit') ?>" name="floor" title="<?php /* @escapeNotVerified */ echo __('Floor/Unit') ?>" class="input-text" id="floor" required />
+                        <label class="label" for="floor"><span><?php /* @escapeNotVerified */ echo __('Floor/Unit') ?></span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="field city col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    <div class="control">
+                        <input type="text" value="<?php echo $block->getFormData()->getData('building');?>" placeholder="<?php /* @escapeNotVerified */ echo __('Building Name') ?>" name="building" title="<?php /* @escapeNotVerified */ echo __('Building Name') ?>" class="input-text" id="building" required />
+                        <label class="label" for="building"><span><?php /* @escapeNotVerified */ echo __('Building Name') ?></span></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="field zip col-lg-6 col-md-6 col-sm-6 col-xs-12 required">
+                <div class="form-group">
+                    <div class="control required">
+                        <input type="text" placeholder="<?php /* @escapeNotVerified */ echo __('Zip/Postal Code') ?>" name="postcode" 
+                        value="<?php echo $block->escapeHtml($block->getFormData()->getData('postcode')) ?>" 
+                        title="<?php /* @escapeNotVerified */ echo __('Zip/Postal Code') ?>" id="zip" 
+                        data-validate="{'validate-postal-code':true}" class="input-text validate-zip-international required-entry <?php /* @escapeNotVerified */ echo $this->helper('Magento\Customer\Helper\Address')->getAttributeValidationClass('postcode') ?>" 
+                        required />
+                        <label class="label" for="zip"><span><?php /* @escapeNotVerified */ echo __('Zip/Postal Code') ?></span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="field country col-lg-6 col-md-6 col-sm-6 col-xs-12 required">
+                <div class="form-group">
+                    <div class="control required">
+                        <?php echo $customerHelper->getCountryHtmlSelect() ?>
+                        <label class="label" for="country"><span><?php /* @escapeNotVerified */ echo __('Country') ?></span></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field company">
+            <div class="form-group ">
+                <div class="control">
+                    <input name="company" value="<?php echo $block->getFormData()->getData('company') ?>" type="text" placeholder="Company (optional)" autocomplete="company" id="company" title="<?php echo __('Company (optional)')?>" class="input-text" required>
+                    <label class="label" for="company"><span><?php /* @escapeNotVerified */ echo __('Company (optional)') ?></span></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="field email required">
+            <div class="form-group ">
+                <div class="control">
+                    <input name="email" value="<?php echo $block->getFormData()->getData('email') ?>" type="text" placeholder="Email" autocomplete="email" id="email-address" title="<?php echo __('Email')?>" class="input-text" data-validate="{required: true, 'validate-email': true}" required >
+                    <label class="label" for="email-address"><span><?php /* @escapeNotVerified */ echo __('Email') ?></span></label>
+                </div>
+            </div>
+        </div>
+<!-- 
+        <div class="field password required">
+            <div class="form-group" data-mage-init='{"passwordStrengthIndicator": {}}'>
+                <div class="control">
+
+                    <input name="password" placeholder="Password" id="password" type="password"
+                           title="<?php /* @escapeNotVerified */ echo __('Password') ?>"
+                           class="input-text"
+                           data-password-min-length="<?php echo $block->escapeHtml($block->getMinimumPasswordLength())?>"
+                           data-password-min-character-sets="<?php echo $block->getRequiredCharacterClassesNumber() ?>"
+                           data-validate='{"required": true, "validate-customer-password-custom": true}'
+                           autocomplete="off"
+                           required
+                           value="<?php echo $block->getFormData()->getData('password') ?>">
+                    <label class="label" for="password"><span><?php /* @escapeNotVerified */ echo __('Password') ?></span></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="field confirmation required">
+            <div class="form-group">
+                <div class="control">
+                    <input type="password" placeholder="Confirm Password" name="password_confirmation" title="<?php /* @escapeNotVerified */ echo __('Confirm Password')?>" class="input-text" id="password_confirmation"
+                           data-validate='{required: true, equalTo: "#password"}' autocomplete="off" required
+                           value="<?php echo $block->getFormData()->getData('password_confirmation') ?>">
+                    <label class="label" for="password_confirmation"><span><?php /* @escapeNotVerified */ echo __('Confirm Password') ?></span></label>
+                </div>
+            </div>
+        </div> -->
+
+        <input type="hidden" name="default_shipping" value="1">
+        <input type="hidden" name="default_billing" value="1">
+        <input type="hidden" name="create_address" value="1" />
+        <input type="hidden" name="country_phone_code" id="country_phone_code" value="" />
+        <input type="hidden" name="telephone" id="telephone" value="" />
+        <input type="hidden" name="city" id="city" value="" />
+
+        <?php if ($block->isNewsletterEnabled()): ?>
+
+            <div class="form-group checkbox choice newsletter">
+                <input type="checkbox" name="is_subscribed" title="<?php /* @escapeNotVerified */ echo __('Send me Far East Flora Garden Centre new arrival updates, offers, and more.') ?>" value="1" id="is_subscribed"  class="checkbox">
+                <label for="is_subscribed"><?php /* @escapeNotVerified */ echo __('Send me Far East Flora Garden Centre new arrival updates, offers, and more.') ?></label>
+            </div>
+        <?php endif ?>
+        <div class="form-group checkbox choice term-policy margin-top30 required">
+            <input type="checkbox" name="term_policy" title="<?php /* @escapeNotVerified */ echo __('I agree to Far East Flora Garden Centre Terms & Conditions and Privacy Policy.') ?>" value="1"
+                   id="term_policy"
+                   data-validate="{required:true}"
+                   class="input-checkbox checkbox required"  />
+            <label for="term_policy"><?php /* @escapeNotVerified */ echo __('I agree to Far East Flora Garden Centre') ?> <a target="blank" href="<?php echo $customerHelper->getTermAndConditionUrl()?>"><?= __('Terms & Conditions')?></a><?= __(' and ')?><a target="blank" href="<?php echo $customerHelper->getPrivacyPoliciesUrl()?>"><?= __('Privacy Policy')?></a>.</label>
+        </div>
+
+        <?php echo $block->getChildHtml('form_additional_info_register'); ?>
+    
+    </fieldset>
+
+
+    <div class="row">
+        <div class="field otp col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <div class="form-group">
+                <div class="control">
+                    <input name="register[otp]" placeholder="OTP" value="" id="register-otp" type="text" class="input-text" style="display:none" title="<?php /* @escapeNotVerified */ echo __('OTP') ?>">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="field note margin-bottom10"  id="register-validation-info" style="background-color:#edd8a1;display:none"><?php /* @escapeNotVerified */ echo __('Please input OTP that has been sent in your email.') ?></div>
+    <div class="field note margin-bottom10"  id="register-validation-error" style="color:red"></div>
+    <div class="actions-toolbar">
+        <div class="primary">
+            <!-- <button type="submit" class="action submit primary btn btn-primary btn-lg" title="<?php /* @escapeNotVerified */ echo __('Create An Account')?>"><span><?php /* @escapeNotVerified */ echo __('Create an Account') ?></span></button> -->
+            <button type="button" class="action submit primary btn btn-primary btn-lg" name="register" id="register"><span><?php /* @escapeNotVerified */ echo __('Create An Account') ?></span></button>
+            <a class="margin-left15 action resend" href="" id="resend" style="display:none"><span><?php /* @escapeNotVerified */ echo __('Resend OTP') ?></span></a>
+        </div>
+    </div>
+
+</form>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Customer/js/validation": {}
+        }
+    }
+</script>
+<script  type="text/javascript">
+    require([ 'jquery',
+        'jquery/ui',
+        'jquery/validate',
+        'mage/translate'], function($) {
+        var dataForm = $('#form-validate');
+        var regEx = new RegExp('<?php echo $block->getCustomerPasswordValidate();?>');
+        dataForm.mage('validation', {}).find('input:text').attr('autocomplete', 'off');
+        $.validator.addMethod(
+            'validate-customer-password-custom', function (v,elm) {
+                return (v.length >= 8 && regEx.test(v));
+            },$.mage.__('Password require minimum 8 characters and 1 number.'));
+        $("#prefix").val("<?php echo $prefix?>");
+        $("#firstname").val("<?php echo $firstName?>");
+        $("#lastname").val("<?php echo $lastName?>");
+
+        $("#fieldset-create-info").show();
+        $('#register-otp').hide();
+        $('#resend').hide();
+        $('#register-validation-info').hide();
+        $('#register-validation-error').hide();
+        
+        $.validator.addMethod(
+            'validate-date-dob', function (v) {
+                if(!v) return true;
+                var regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+                if(!regex.test(v)) return false;
+                var d = new Date(v.replace(regex, '$1/$2/$3'));
+                return ( parseInt(RegExp.$1, 10) == (1+d.getMonth()) ) &&
+                    (parseInt(RegExp.$2, 10) == d.getDate()) &&
+                    (parseInt(RegExp.$3, 10) == d.getFullYear() );
+
+
+            },'<?= __('Please enter a valid date.') ?>');
+
+            $(".customer-dob .date-time select").each(function(){
+            $(this).on('change',function() {
+                fortmatDateDob();
+            })
+        });
+
+        $.validator.addMethod(
+            'validate-postal-code', function (v) {
+                console.log('validate-postal-code');
+                console.log(v);
+                if(!v) return true;
+                var regex = /^[0-9]*$/;
+                if(!regex.test(v)) return false;
+                return true;
+            },'<?= __('Only numbers allowed.') ?>'
+        );
+
+        function fortmatDateDob() {
+            let month = $("#dob_mm").val();
+            let day = $("#dob_dd").val();
+            let year = $("#dob_yy").val();
+            $('input[id=dob]').val(month + '/' + day + '/' + year);
+            let dayConvert = day;
+            if(dayConvert < 10) {
+                dayConvert = '0' + day;
+            }
+            let monthConvert = month;
+            if(monthConvert < 10) {
+                monthConvert = '0' + monthConvert;
+            }
+            $('#dob-validate').val(monthConvert + '/' + dayConvert  + '/' + year);
+        }
+
+        $(".contact_number select").each(function(){
+            $(this).on('change',function() {
+                updatePhoneValues();
+            })
+        })
+
+        $("#contact_number_1").on('change',function() {
+            updatePhoneValues();
+        })
+
+        setTimeout(function(){
+            if( $(".form-create-account").find('select[name="country_id"]').length ) {
+                $(".form-create-account").find('select[name="country_id"]').val("SG");
+            }
+        },100);
+        var $form = $('.form-create-account');
+        
+
+        
+        $('#resend').click(function (e) {
+                e.preventDefault();
+                if($("#email-address").val()==""){
+                    alert("Please fill the email first");
+                }else{
+                    $.ajax({
+                        url: '/sso/customer/resendotp',
+                        cache: false,
+                        showLoader: true,
+                        type: 'POST',
+                        data: {
+                            "email" : $("#email-address").val(),
+                        },
+                        success: function (response) {
+                            console.log(response);
+                            if(response.success==true){   
+                                $('#register-validation-info').text(response.message);
+                                $('#register-validation-info').show();
+                                $('#register-validation-error').hide();
+                                $('#register-otp').show();
+                                $('#resend').show();
+                                $("#register").html("Submit");
+                            } else {
+                                $('#register-validation-error').show();
+                                $('#register-validation-error').text(response.message);
+                                $('#register-validation-info').hide();
+                                $('#register-otp').hide();
+                                $('#resend').hide();
+                                $("#register").html("Create An Account");
+                            }
+                        },
+                        fail: function (response) {
+                            console.log("failed");
+                            console.log(response);
+                        }
+                    });
+                } 
+            })
+        
+        $('#register').click(function (e) {
+            // registerEmail();
+            e.preventDefault();
+            if ($form.valid()) {
+                $('body').trigger('processStart');
+                if($("#dob_yy").val() && $("#dob_mm").val() && $("#dob_dd").val()) {
+                    fortmatDateDob();
+                }
+                updatePhoneValues();
+                var buttonText = $(this).text();
+                if(buttonText=="Create An Account"){
+                    registerEmail(0);
+                }else{
+                    if($("#register-otp").val()==""){
+                        alert("Please fill OTP to submit register");
+                    } else {
+                        registerEmail($("#register-otp").val());
+                        $('#register-validation-info').hide();
+                    }
+                }
+                return true;
+            }
+        })
+
+        function registerEmail(otpValue) {
+            var otpField = $('#register-otp');
+            var formData = $form.serialize();
+            
+            var $this=$(this);
+            $.ajax({
+                url: '/sso/customer/registeremail',
+                cache: false,
+                showLoader: true,
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    console.log(response);
+                    if(response.success==true){                        
+                        // $("#fieldset-create-info").hide();
+
+                        if($("#register").text()=="Submit"){
+                            console.log("after submit");
+                            $("#register").html("Create An Account");
+                            otpField.hide();
+                            $('#resend').hide();
+                            window.location.href = "/customer/account";
+                        }else{
+                            console.log("after create account");
+                            $("#register").html("Submit");
+                        }
+                        $('#register-validation-info').text(response.message);
+                        $('#register-validation-info').show();
+                        $('#register-validation-error').hide();
+                        otpField.show();
+                        $('#resend').show();
+                    } else {
+                        if($("#register").text()!="Submit"){
+                            otpField.hide();
+                            $('#resend').hide();
+                        }
+                        $('#register-validation-error').show();
+                        $('#register-validation-error').text(response.message);
+                        $('#register-validation-info').hide();
+                    }
+                    $('.loader').hide();
+                    $('.loading-mask').hide();
+                },
+                fail: function (response) {
+                    console.log("failed");
+                    console.log(response);
+                }
+            });
+        }
+
+        function updatePhoneValues() {
+            let country_phone_code = $("#contact_number").val();
+            let telephone = $("#contact_number_1").val();
+            let city = $("#country option:selected").text();
+            $('input[id=country_phone_code]').val(country_phone_code);
+            $('input[id=telephone]').val(telephone);
+            $('input[id=city]').val(city);
+        }
+
+    });
+</script>

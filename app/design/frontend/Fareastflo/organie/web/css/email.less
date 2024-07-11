@@ -1,0 +1,43 @@
+//
+//  Styles for emails
+//  _____________________________________________
+
+//  Import these file by reference so that only the styles included in the .email-non-inline() and .media-width()
+//  mixins will be output. All other styles will be output via the email-inline.less file.
+
+//
+//  Module-specific styles for emails
+//  ---------------------------------------------
+
+//  Import files using (reference) for the same reason stated above
+
+//
+//  Media queries collector
+//  ---------------------------------------------
+
+//  It is impossible to apply media queries as inline styles, so all media queries must be output in this file
+@import 'fonts/style.less';
+//
+//  Non-inline styles
+//  ---------------------------------------------
+
+//  Include all styles that have been indicated as non-inline styles
+
+@font-family__base: @font-family__name,sans-serif,Helvetica,Arial;
+@font-family__second: "Playfair Display",sans-serif;
+
+body {
+    font-family: @font-family__base;
+    font-weight: normal;
+    text-align: left;
+}
+
+th,
+td {
+    font-family: @font-family__base;
+}
+
+a {
+    color: #333;
+    text-decoration: none;
+}

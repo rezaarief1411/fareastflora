@@ -1,0 +1,30 @@
+<script type="text/x-magento-init">
+{
+    "*": {
+        "scriptsFlora": {}
+    }
+
+}
+</script>
+<script type="text/javascript">
+    require([
+        "jquery"
+    ], function($){
+        $(window).on('scroll', function(){
+            if(window.pageYOffset + $(window).outerHeight() > $('.footer-container').offset().top){
+                let script = document.createElement("script");
+                script.type = "text/x-magento-init";
+                script.innerHTML = "{\"*\":{\"footerCollapse\":{}}}";
+                $('footer-container').append(script);
+                $('footer-container').trigger('contentUpdated');
+            }
+        });
+        $('body').on('mouseenter', 'nav.navigation', function(){
+            let script2 = document.createElement("script");
+            script2.type = "text/x-magento-init";
+            script2.innerHTML = "{\"*\":{\"megaMenu\":{}}}";
+            $('nav.navigation').append(script2);
+            $('nav.navigation').trigger('contentUpdated');
+        });
+    });
+</script>

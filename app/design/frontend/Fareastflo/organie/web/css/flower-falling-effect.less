@@ -1,0 +1,132 @@
+.g-snows {
+    position: relative;
+    z-index: 9999;
+}
+.g-snows > li {
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    border-radius: 100%;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-size: 100% auto !important;
+    animation-name: snow-drop;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    background: url(https://www.thegioididong.com/Content/newYear2020/leaf-v2.png);
+}
+.g-snows > li:nth-child(1) {
+    left: 17%;
+    width: 7px;
+    height: 7px;
+    animation-duration: 7606ms;
+    animation-delay: 799ms;
+}
+.g-snows > li:nth-child(2) {
+    left: 26%;
+    width: 1px;
+    height: 1px;
+    animation-duration: 8168ms;
+    animation-delay: 2786ms;
+}
+.g-snows > li:nth-child(3) {
+    left: 39%;
+    width: 9px;
+    height: 9px;
+    animation-duration: 10347ms;
+    animation-delay: 4057ms;
+}
+.g-snows > li:nth-child(4) {
+    left: 54%;
+    width: 2px;
+    height: 2px;
+    animation-duration: 8869ms;
+    animation-delay: 3447ms;
+}
+.g-snows > li:nth-child(5) {
+    left: 66%;
+    width: 12px;
+    height: 12px;
+    animation-duration: 10346ms;
+    animation-delay: 3012ms;
+}
+.g-snows > li:nth-child(6) {
+    left: 81%;
+    width: 5px;
+    height: 5px;
+    animation-duration: 5360ms;
+    animation-delay: 2400ms;
+}
+.g-snows > li:nth-child(7) {
+    left: 97%;
+    width: 7px;
+    height: 7px;
+    animation-duration: 7269ms;
+    animation-delay: 634ms;
+}
+.g-snows > li:nth-child(4n) {
+    width: 14px;
+    height: 14px;
+    background-position: -31px 0;
+}
+.g-snows > li:nth-child(4n + 1) {
+    width: 16px;
+    height: 16px;
+    background-position: 0 -23px;
+}
+.g-snows > li:nth-child(4n + 2) {
+    width: 13px;
+    height: 13px;
+    background-position: 0 -50px;
+}
+.g-snows > li:nth-child(4n + 3) {
+    width: 15px;
+    height: 15px;
+    background-position: -49px -35px;
+}
+@keyframes snow-drop {
+    0% {
+        transform: translate(0, 0);
+        opacity: 0.5;
+        margin-left: 0;
+    }
+    10% {
+        margin-left: 15px;
+    }
+    20% {
+        margin-left: 20px;
+    }
+    25% {
+        transform: translate(0, 166.66667px);
+        opacity: 0.75;
+    }
+    30% {
+        margin-left: 15px;
+    }
+    40% {
+        margin-left: 0;
+    }
+    50% {
+        transform: translate(0, 466.66667px);
+        opacity: 1;
+        margin-left: -15px;
+    }
+    60% {
+        margin-left: -20px;
+    }
+    70% {
+        margin-left: -15px;
+    }
+    75% {
+        transform: translate(0, 800px);
+        opacity: 0.5;
+    }
+    80% {
+        margin-left: 0;
+    }
+    100% {
+        transform: translate(0, 1000px);
+        opacity: 0;
+    }
+}

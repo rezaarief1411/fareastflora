@@ -1,0 +1,163 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Magento\Customer\Block\Form\Login $block */
+?>
+<?php
+/**
+ * Customer login form template
+ *
+ * @see \Magento\Customer\Block\Form\Login
+ * @var $block \Magento\Customer\Block\Form\Login
+ */
+?>
+<div class="block block-customer-login">
+    <div class="block-title">
+		<h3 class="title" id="block-customer-login-heading" role="heading" aria-level="2"><span><?php /* @escapeNotVerified */ echo __('Registered Customers') ?></span></h3>
+    </div>
+    <div class="block-content" aria-labelledby="block-customer-login-heading">
+        <fieldset class="fieldset login" data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
+            <div class="field note margin-bottom10"><?php /* @escapeNotVerified */ echo __('If you have an account, sign in with your email address.') ?></div>
+            <div class="field email required">
+                <div class="form-group">
+                    <div class="control">
+                        <input name="login[username]" placeholder="Email" value="<?php echo $block->escapeHtml($block->getUsername()) ?>" id="email" type="text" class="input-text" title="<?php /* @escapeNotVerified */ echo __('Email') ?>" data-validate="{required:true, 'validate-email':true}" required>
+                        <label class="label" for="email"><span><?php /* @escapeNotVerified */ echo __('Email') ?></span></label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="field">
+                <div class="form-group">
+                    <div class="control">
+                        <input name="login[otp]" placeholder="OTP" value="" id="otp" type="text" class="input-text" style="display:none" title="<?php /* @escapeNotVerified */ echo __('OTP') ?>" data-validate="{required:true}" required>
+                    </div>
+                </div>
+            </div>
+            <div class="field note margin-bottom10"  id="validation-info" style="background-color:#edd8a1;display:none"><?php /* @escapeNotVerified */ echo __('Please input OTP that has been sent in your email.') ?></div>
+            <div class="field note margin-bottom10"  id="validation-error" style="color:red"></div>
+            <div class="actions-toolbar padding-top10" style="padding-top : 0px !important">
+                <button type="button" class="action login btn btn-primary btn-lg" name="validate" id="validate"><span><?php /* @escapeNotVerified */ echo __('Request OTP') ?></span></button>
+                <a class="margin-left15 action login-resend" href="" id="login-resend" style="display:none"><span><?php /* @escapeNotVerified */ echo __('Resend OTP') ?></span></a>
+            </div>
+        </fieldset>
+    </div>
+</div>
+
+<script  type="text/javascript">
+    require([ 'jquery',
+        'mage/translate'], function($) {
+            $('#otp').hide();
+            $('#login-resend').hide();
+            $('#validation-info').hide();
+            $('#validation-error').hide();
+
+            $("#validate").click(function(){
+                var buttonText = $(this).text();
+                if($("#email").val()==""){
+                    alert("Please fill the email first");
+                }else{
+                    if(buttonText=="Request OTP"){
+                        validateEmail(0);
+                    }else{
+                        if($("#otp").val()==""){
+                            alert("Please fill OTP to submit login");
+                        } else {
+                            validateEmail($("#otp").val());
+                            $('#validation-info').hide();
+                        }
+                    }
+                }
+            });
+
+            $('#login-resend').click(function (e) {
+                e.preventDefault();
+                if($("#email").val()==""){
+                    alert("Please fill the email first");
+                }else{
+                    $.ajax({
+                        url: '/sso/customer/resendotp',
+                        cache: false,
+                        showLoader: true,
+                        type: 'POST',
+                        data: {
+                            "email" : $("#email").val(),
+                        },
+                        success: function (response) {
+                            console.log(response);
+                            if(response.success==true){   
+                                $('#validation-info').text(response.message);
+                                $('#validation-info').show();
+                                $('#validation-error').hide();
+                                $('#otp').show();
+                                $('#login-resend').show();
+                                $("#validate").html("Submit");
+                            } else {
+                                $('#validation-error').show();
+                                $('#validation-error').text(response.message);
+                                $('#validation-info').hide();
+                                $('#otp').hide();
+                                $('#login-resend').hide();
+                                $("#validate").html("Request OTP");
+                            }
+                            // $('.loader').hide();
+                            // $('.loading-mask').hide();
+                        },
+                        fail: function (response) {
+                            console.log("failed");
+                            console.log(response);
+                        }
+                    });
+                } 
+            })
+
+            function validateEmail(otpValue) {
+                $.ajax({
+                    url: '/sso/customer/syncemail',
+                    cache: false,
+                    showLoader: true,
+                    type: 'POST',
+                    data: {
+                        email: $("#email").val(),
+                        otp: otpValue
+                    },
+                    success: function (response) {
+                        // console.log(response);
+                        if(response.success==true){
+                            $('#otp').show();
+                            $('#login-resend').show();
+                            if($("#validate").text()=="Submit"){
+                                $("#validate").html("Request OTP");
+                                $('#otp').hide();
+                                $('#login-resend').hide();
+                                window.location.href = "/customer/account";
+                            }else{
+                                $("#validate").html("Submit");
+                                $('#login-resend').show();
+                            }
+                            $('#validation-info').text(response.message);
+                            $('#validation-info').show();
+                            $('#validation-error').hide();
+                        } else {
+                            $('#validation-error').show();
+                            $('#validation-error').text(response.message);
+                            $('#otp').hide();
+                            $('#login-resend').hide();
+                            $("#validate").html("Request OTP");
+                            $('#validation-info').hide();
+                        }
+                        
+                    },
+                    fail: function (response) {
+                        console.log("failed");
+                        console.log(response);
+                    }
+                });
+            }
+    });
+</script>

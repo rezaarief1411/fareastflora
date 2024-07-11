@@ -1,0 +1,941 @@
+@bundle__background-color: #f2f2f2;
+@bundle__disable-color: #ddd;
+@qty__border: grey;
+@input__color: white;
+@label__color: #295135;
+
+.checkout-cart-index {
+    .form.form-cart {
+        &#form-validate {
+
+            tbody.cart.item, tbody.cart.addon-item {
+                .item-info {
+                    &.bundle-group {
+                        .control.qty.hidden-field {
+                            background-color: @bundle__disable-color;
+                            border: 1px solid @qty__border;
+
+                            .input-text.qty.hidden-input {
+                                background-color: @bundle__disable-color;
+                            }
+                        }
+                    }
+
+                    .control.qty {
+                        border: 1px solid @qty__border;
+                    }
+                }
+            }
+
+            tbody.cart.item:nth-child(odd) {
+                .control.qty {
+                    background-color: @input__color;
+                    .input-text.qty {
+                        background-color: @input__color;
+                    }
+                }
+            }
+
+            tbody.cart.addon-item {
+                border-top: none;
+            }
+
+            tbody.cart.item.grey, tbody.cart.addon-item.grey{
+                background-color: @bundle__background-color;
+            }
+        }
+    }
+}
+
+/* Bundle product detail page */
+
+.page-product-bundle {
+    .product-info-price{
+        display: none;
+        .price-box.price-final_price{
+            >p.minimal-price{
+                margin-bottom: 0;
+            }
+        }
+    }
+    .bundle-actions {
+        display: none;
+    }
+
+    .bundle-options-container {
+        .product-add-form {
+            padding-top: 0;
+            display: block !important;
+
+            .price-as-configured {
+                display: flex;
+                align-items: center;
+
+                .special-price {
+                    margin-left: 10px;
+                }
+            }
+
+            .bundle-options-overview-container {
+                .bundle-options-wrapper {
+                    width: 100% !important;
+
+                    .fieldset {
+                        p.required {
+                            display: none !important;
+                        }
+
+                        .fieldset.fieldset-bundle-options {
+                            .legend.title {
+                                &#customizeTitle {
+                                    display: none;
+                                }
+                            }
+
+                            .action.back.customization {
+                                display: none;
+                            }
+
+                            .field.option.required {
+                                margin-bottom: 0;
+                                padding-bottom: 0;
+
+                                > .label {
+                                    //display: none;
+                                    text-transform: uppercase;
+                                    font-weight: 600;
+                                    font-size: 20px;
+
+                                    > span {
+                                        &::after {
+                                            content: ":";
+                                        }
+
+                                        &:before {
+                                            display: none;
+                                        }
+                                    }
+                                }
+
+                                .control {
+                                    .nested.options-list {
+                                        > .label {
+                                            text-transform: uppercase;
+                                            font-weight: 600;
+                                            font-size: 20px;
+
+                                            > span::after {
+                                                content: ":";
+                                            }
+                                        }
+
+                                        > .product-name, > .price-notice, > .product-name {
+                                            display: none;
+                                        }
+
+                                        > .bundle-option-slider {
+                                            > .slick-arrow.fa {
+                                                top: calc(45%)
+                                            }
+
+                                            .slick-list.draggable {
+                                                margin-left: 12px;
+                                                height: 150px;
+
+                                                .field.choice {
+                                                    input[type="radio"]:checked + label.label{
+                                                        .bundle-option-image{
+                                                            border: 2px solid #295135;
+                                                            opacity: 1;
+                                                            filter: grayscale(0);
+                                                        }
+                                                    }
+                                                    > label.label {
+                                                        margin-top: 20px;
+                                                        padding: 0;
+                                                        position: unset;
+                                                        cursor: pointer;
+
+                                                        .bundle-option-image{
+                                                            &.disable{
+                                                                opacity: 0.5;
+                                                                filter: grayscale(100%);
+                                                            }
+                                                        }
+
+                                                        > span, > br {
+                                                            display: none;
+                                                        }
+                                                    }
+
+                                                    .label::before {
+                                                        display: none;
+                                                    }
+
+                                                    .label::after {
+                                                        display: none;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            .field.option.repot,
+                            .field.option.non-repot{
+                                margin-top: 20px;
+                                margin-bottom: 0;
+
+                                .label {
+                                    left: -20px;
+
+                                    .product-name {
+                                        display: none;
+                                        color: black;
+                                        font-size: 23px;
+                                        margin-left: 10px;
+                                        font-weight: 600;
+                                    }
+
+                                    .repot-label::before {
+                                        content: "REPOT YOUR PLANT?";
+                                        color: black;
+                                        font-size: 23px;
+                                        margin-left: 10px;
+                                        font-weight: 600;
+                                    }
+                                    .repot-fee::before{
+                                        content: "Reporting charge";
+                                    }
+                                }
+
+                                .label::before {
+                                    left: -11px;
+                                    top: 6px;
+                                    cursor: pointer;
+                                }
+
+                                .label::after {
+                                    left: -6px;
+                                    top: 6px;
+                                    cursor: pointer;
+                                }
+                            }
+
+                            .field.choice {
+                                width: 100%;
+                            }
+
+                            .field.qty.qty-holder {
+                                display: none !important;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .block-bundle-summary {
+                width: 100% !important;
+                margin-top: 20px;
+                padding-left: 0;
+
+                .title {
+                    display: none;
+                }
+
+                .content {
+                    .bundle-info {
+                        .product-image-container {
+                            display: none;
+                        }
+
+                        .product-details {
+                            width: 100%;
+
+                            .product.name {
+                                display: none;
+                            }
+
+                            .price-box.price-configured_price {
+                                display: none;
+                            }
+                        }
+                    }
+
+                    .bundle-summary {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1080px){
+    .page-product-bundle {
+        .bundle-options-container {
+            .product-add-form {
+                .bundle-options-overview-container {
+                    .bundle-options-wrapper {
+                        .fieldset {
+                            .fieldset.fieldset-bundle-options {
+                                .field.option.required {
+
+                                    .control {
+                                        .nested.options-list {
+                                            > .bundle-option-slider {
+                                                .slick-list.draggable {
+                                                    height: 100px;
+                                                }
+
+                                                > .slick-arrow.fa {
+                                                    top: calc(30%)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* Ipad */
+
+@media (max-width: 768px){
+    .page-product-bundle {
+        .bundle-options-container {
+            margin-top: 10px;
+            .product-add-form {
+                .bundle-options-overview-container {
+                    .bundle-options-wrapper {
+                        .fieldset {
+                            .fieldset.fieldset-bundle-options {
+                                .field.option.required {
+
+                                    .control {
+                                        .nested.options-list {
+                                            > .bundle-option-slider {
+                                                > .slick-arrow.fa {
+                                                    top: calc(45%)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 480px){
+    .page-product-bundle {
+        .bundle-options-container {
+            .product-add-form {
+                padding-top: 10px;
+                .bundle-options-overview-container {
+                    display: flex;
+                    flex-direction: column-reverse;
+                    .bundle-options-wrapper {
+                        margin-bottom: 0;
+                        .fieldset {
+                            .fieldset.fieldset-bundle-options {
+                                .field.option.required {
+
+                                    .control {
+                                        .nested.options-list {
+                                            > .bundle-option-slider {
+                                                .slick-list.draggable {
+                                                    height: 115px;
+                                                }
+                                            }
+                                            .label{
+                                                font-size: 16px;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                .field.option.repot,
+                                .field.option.non-repot {
+                                    margin-bottom: 0;
+                                    padding-bottom: 0;
+                                    .label {
+                                        .product-name,
+                                        .repot-label::before {
+                                            content: "POT YOUR PLANT?";
+                                            margin-left: 20px;
+                                            font-size: 16px;
+                                        }
+
+                                        .repot-fee::before{
+                                            content: "Potting Fee";
+                                            font-size: 16px;
+                                        }
+                                    }
+
+                                    .label::before {
+                                        top: 0px;
+                                        left: 2px;
+                                    }
+
+                                    .label::after {
+                                        top: 0px;
+                                        left: 6px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+@media (max-width: 380px){
+    .page-product-bundle {
+        .bundle-options-container {
+            .product-add-form {
+                .bundle-options-overview-container {
+                    .bundle-options-wrapper {
+                        .fieldset {
+                            .fieldset.fieldset-bundle-options {
+                                .field.option.required {
+
+                                    .control {
+                                        .nested.options-list {
+                                            > .bundle-option-slider {
+                                                .slick-list.draggable {
+                                                    height: 148px;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                .field.option.repot,
+                                .field.option.non-repot {
+                                    .label {
+                                        .product-name,
+                                        .repot-label::before {
+                                            font-size: 15px;
+                                            margin-left: 18px;
+                                        }
+                                    }
+
+                                    .label::before {
+                                        top: 1px;
+                                        width: 16px;
+                                        height: 16px;
+                                    }
+
+                                    .label::after {
+                                        font-size: 13px;
+                                        left: 5px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* Bundle product minicart */
+
+.minicart-wrapper{
+    .block.block-minicart{
+        >#minicart-content-wrapper{
+            #mini-cart{
+                &.minicart-items {
+                    .item.product.product-item {
+                        border: none;
+                        &.addon-item.grey {
+                            background-color: @bundle__background-color;
+                            margin-top: -2px;
+                            .details-qty.qty{
+                                background-color: @input__color;
+                                .cart-item-qty{
+                                    background-color: @input__color;
+                                }
+                            }
+                        }
+
+                        &.normal-item.grey {
+                            background-color: @bundle__background-color;
+                            border-bottom: 1px solid #f4f1e2;
+                            border-top: 1px solid #f4f1e2;
+                            .details-qty.qty{
+                                background-color: @input__color;
+                                .cart-item-qty{
+                                    background-color: @input__color;
+                                }
+                            }
+                        }
+
+                        &.bundle-item.grey {
+                            background-color: @bundle__background-color;
+                            border-bottom: none;
+                            margin-top: -2px;
+                            .details-qty.qty{
+                                background-color: @input__color;
+                                .cart-item-qty{
+                                    background-color: @input__color;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+.page-products, .cms-home {
+    .popular_section {
+        .mgs-products.products-grid.productv3 {
+            &.sale-products-grid, &.type-products-grid {
+                .item.product.product-item {
+                    margin-bottom: 100px;
+                }
+
+                fieldset.fieldset.fieldset-bundle-options {
+                    .nested.options-list {
+                        .bundle-option-slider {
+                            min-width: 240px;
+                        }
+                    }
+                    .field.option.repot,
+                    .field.option.non-repot {
+                        .label {
+                            .price-notice {
+                                font-size: 12px;
+                            }
+
+                            .repot-fee::before {
+                                font-size: 13px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .sun-loving-plants {
+        .mgs-products.products-grid.productv3 {
+            &.sale-products-grid, &.type-products-grid {
+                .item.product.product-item {
+                    margin-bottom: 145px;
+                }
+
+                fieldset.fieldset.fieldset-bundle-options {
+                    .nested.options-list {
+                        .bundle-option-slider {
+                            min-width: 240px;
+                        }
+                    }
+
+                    .field.option.repot {
+                        .label {
+                            .price-notice {
+                                font-size: 12px;
+                            }
+
+                            .repot-fee::before {
+                                font-size: 13px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .mgs-products.products-grid.productv3 {
+        &.sale-products-grid, &.type-products-grid {
+            .item.product.product-item {
+                margin-bottom: 120px;
+            }
+            .product-item-info.bundle {
+                &:hover {
+                    transition: unset;
+                    .product.photo.product-item-photo.bundle {
+                        overflow: unset;
+                        left: -20px;
+                        width: ~'calc(100% + 40px)';
+                    }
+                    .product-item-inner.bundle {
+                        left: -20px;
+                        width: ~'calc(100% + 40px)';
+                    }
+                }
+            }
+
+            fieldset.fieldset.fieldset-bundle-options {
+                .nested.options-list {
+                    > .label {
+                        font-size: 12px;
+                    }
+                    .bundle-option-slider {
+                        min-width: 230px;
+                        .slick-list.draggable {
+                            height: 95px;
+                        }
+                    }
+                }
+
+                .field.option.repot {
+                    .label {
+                        left: -18px;
+
+                        .repot-label::before {
+                            font-size: 14px;
+                            margin-left: 5px;
+                        }
+
+                        .price-notice {
+                            font-size: 11px;
+                        }
+
+                        .repot-fee::before {
+                            font-size: 11px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .item.product.product-item{
+        .product.photo.product-item-photo {
+            transition: unset;
+        }
+
+        fieldset.fieldset.fieldset-bundle-options{
+            .hidden-input{
+                display: none;
+            }
+            .nested.options-list{
+                >.field.qty.qty-holder{
+                    display: none;
+                }
+                >.label{
+                    text-transform: uppercase;
+                    font-weight: 600;
+                    font-size: 13px;
+                }
+                >.label::after{
+                    content: ':';
+                }
+                > .bundle-option-slider {
+                    min-width: 290px;
+                    > .slick-arrow.fa {
+                        top: calc(40%)
+                    }
+
+                    .slick-list.draggable {
+                        margin-left: 12px;
+                        height: 110px;
+
+                        .field.choice {
+                            margin-top: 10px;
+                            height: 90%;
+                            >.radio.radio-price{
+                                display: none;
+                            }
+                            > label.label {
+                                margin-top: 20px;
+                                padding: 0;
+                                position: unset;
+                                cursor: pointer;
+
+                                .bundle-option-image.active {
+                                    border: 2px solid #295135;
+                                }
+
+                                .bundle-option-image.disable {
+                                    opacity: 0.5;
+                                    filter: grayscale(100%);
+                                }
+
+                                > span, > br {
+                                    display: none;
+                                }
+                            }
+
+                            .label::before {
+                                display: none;
+                            }
+
+                            .label::after {
+                                display: none;
+                            }
+                        }
+                    }
+                }
+            }
+            .field.option.repot {
+                font-size: unset;
+                .checkbox-price{
+                    display: none;
+                }
+                .label {
+                    left: -21px;
+                    padding-left: 0;
+
+                    .product-name {
+                        display: none;
+                    }
+                    .price-notice{
+                        font-size: 15px;
+                        margin-left: -10px;
+                    }
+
+                    .repot-label::before {
+                        content: "REPOT YOUR PLANT?";
+                        color: black;
+                        font-size: 15px;
+                        margin-left: 10px;
+                        font-weight: 600;
+                    }
+                    .repot-fee::before{
+                        content: "Reporting charge";
+                        font-size: 15px;
+                    }
+                }
+
+                .label::before {
+                    left: -11px;
+                    top: 6px;
+                    cursor: pointer;
+                }
+
+                .label::after {
+                    left: -6px;
+                    top: 6px;
+                    cursor: pointer;
+                }
+                .repot-service{
+                    font: icon;
+                    float: left;
+                    border: none;
+                    background: none;
+                    margin-bottom: 20px;
+                    margin-top: 10px;
+                    font-size: 13px;
+                    border: 1px solid transparent;
+                }
+                .repot-service.active{
+                    color: @label__color;
+                    border: 1px solid @label__color;
+                }
+            }
+        }
+    }
+}
+
+/* Product List */
+.products.wrapper.list.products-list.productv3{
+    .product-item-info{
+        position: relative;
+
+        .product.details.product-item-details.bundle-list{
+            position: static;
+            width: 54%;
+
+            .bundle-option-right{
+                position: absolute;
+                right: 0;
+                top: 55px;
+                width: 310px;
+                border-left: 1px solid #ccc;
+                padding-left: 20px;
+                height: 75%;
+
+                .field.option {
+                    margin-bottom: 10px;
+
+                    &.repot.required {
+                        display: none;
+                    }
+
+                    &.repot{
+                        .field.choice{
+                            >.label{
+                                margin-top: 20px;
+
+                                >.repot-label::before{
+                                    margin-left: 0;
+                                    font-size: 16px;
+                                }
+
+                                >.repot-fee::before{
+                                    font-size: 14px;
+                                }
+
+                                .price-notice{
+                                    font-size: 14px;
+                                }
+                            }
+                        }
+
+                        .repot-service{
+                            margin-top: 20px;
+                        }
+                    }
+                    &.required{
+                        .nested.options-list{
+                            >.label{
+                                font-size: 14px;
+                            }
+                        }
+
+                        .slick-listl.draggable{
+                            .field.choice{
+                                margin-top: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (min-width: 1366px) {
+    .product-item-info.bundle {
+        &:hover {
+            transition: unset;
+
+            .product.photo.product-item-photo.bundle {
+                overflow: unset;
+                left: -30px;
+                width: ~'calc(100% + 60px)';
+            }
+
+            .product-item-inner.bundle {
+                left: -30px;
+                width: ~'calc(100% + 60px)';
+            }
+        }
+    }
+}
+@media (max-width: 1024px){
+    .products-grid {
+        .item.product.product-item {
+            fieldset.fieldset.fieldset-bundle-options {
+                .nested.options-list {
+                    .bundle-option-slider {
+                        min-width: unset;
+                        .slick-list.draggable{
+                            height: 50px;
+                        }
+                    }
+                }
+                .field.option.repot {
+                    .label {
+                        .product-name,
+                        .repot-label::before {
+                            font-size: 10px;
+                        }
+
+                        .price-notice {
+                            font-size: 8px;
+                        }
+
+                        .repot-fee::before {
+                            font-size: 8px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .products.wrapper.list.products-list.productv3{
+        .product.details.product-item-details.bundle-list{
+            width: 66.66666667%;
+
+            .product.actions.product-item-actions {
+                flex-direction: column;
+
+                .bundle-option-right {
+                    position: unset;
+                    border-left: none;
+                    padding: 0 0 15px 0;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px){
+    .products.wrapper.list.products-list.productv3{
+        .product.details.product-item-details.bundle-list{
+            width: 58.33333333%;
+
+            .bundle-option-right{
+                display: none;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px){
+    .products.wrapper.list.products-list.productv3{
+        .product-item-info {
+            .product.details.product-item-details.bundle-list {
+                width: 100%;
+            }
+        }
+    }
+}
+
+/* Bundle product checkout */
+
+.checkout-index-index{
+    .checkout-container{
+        .items-in-cart{
+            .minicart-items{
+                background-color: #eee;
+                padding-top: 0;
+            }
+        }
+    }
+    .minicart-items-wrapper.overflowed{
+        .minicart-items{
+            .product-item{
+                margin-bottom: 0;
+                padding-top: 20px;
+                &.white{
+                    padding-top: 20px;
+                    background-color: white;
+                }
+                &.bundle-item{
+                    border-bottom: none;
+                }
+                &.addon-item{
+                    border-top: solid 1px #eee;
+                }
+            }
+        }
+    }
+}
+.page-product-bundle .product-details-view .product.media{
+    .fotorama__thumb-border.disable {
+        border: none;
+        background-image: none;
+    }
+}

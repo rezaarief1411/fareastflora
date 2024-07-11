@@ -1,0 +1,66 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var $block \Magento\Sales\Block\Order\Totals
+ * @see \Magento\Sales\Block\Order\Totals
+ */
+/** @var \Magento\Sales\Block\Order\Invoice\Totals $block  */
+
+$totalsArray = $block->getTotals();
+$results     = [];
+$tax         = null;
+$grand       = null;
+foreach ($totalsArray as $key => $value) {
+    if ($key == 'tax' || $key == 'grand_total_excl') {
+        if ($key == 'tax') {
+            $tax = $value;
+            continue;
+        }
+        if ($key == 'grand_total_excl') {
+            if(!empty($tax)) {
+                $results['tax'] = $tax;
+                $grand = $value;
+            }
+        }
+    }
+    $results[$key] = $value;
+}
+
+?>
+<?php foreach ($results as $_code => $_total) : ?>
+    <?php if ($_total->getBlockName()) : ?>
+        <?= $block->getChildHtml($_total->getBlockName(), false) ?>
+    <?php else :?>
+    <tr class="<?= $block->escapeHtmlAttr($_code) ?>">
+        <th <?= /* @noEscape */ $block->getLabelProperties() ?> scope="row">
+            <?php if ($_total->getStrong()) : ?>
+                <strong><?= $block->escapeHtml($_total->getLabel()) ?>:</strong>
+            <?php else : ?>
+                <?= $block->escapeHtml($_total->getLabel()) ?>:
+            <?php endif ?>
+        </th>
+        <?php if ($_total->getStyle()) : ?>
+            <td <?= /* @noEscape */ $block->getValueProperties() ?> data-th="<?= $block->escapeHtmlAttr($_total->getLabel()) ?>" style="color:#cf2a27">
+                <?php if ($_total->getStrong()) : ?> 
+                    <strong><?= /* @noEscape */ $block->formatValue($_total) ?></strong>
+                <?php else : ?>
+                    <?= /* @noEscape */ $block->formatValue($_total) ?>
+                <?php endif?>
+            </td>
+        <?php else : ?>
+            <td <?= /* @noEscape */ $block->getValueProperties() ?> data-th="<?= $block->escapeHtmlAttr($_total->getLabel()) ?>">
+                <?php if ($_total->getStrong()) : ?>
+                    <strong><?= /* @noEscape */ $block->formatValue($_total) ?></strong>
+                <?php else : ?>
+                    <?= /* @noEscape */ $block->formatValue($_total) ?>
+                <?php endif?>
+            </td>
+        <?php endif ?>
+        
+    </tr>
+    <?php endif; ?>
+<?php endforeach?>

@@ -1,0 +1,70 @@
+<!--app/design/frontend/Fareastflo/organie/Magento_Sales/templates/email/shipment/items.phtml-->
+<?php $_shipment = $block->getShipment() ?>
+<?php $_order = $block->getOrder() ?>
+<?php
+/** @var \Smartosc\CustomBundleProduct\Helper\Data $helper */
+$helper = $this->helper(\Smartosc\CustomBundleProduct\Helper\Data::class);
+/** @var \Smartosc\CustomBundleProduct\Helper\CartItemHelper $addonHelper */
+$addonHelper = $this->helper(\Smartosc\CustomBundleProduct\Helper\CartItemHelper::class);
+?>
+<?php if ($_shipment && $_order) : ?>
+    <table class="email-items">
+        <thead>
+        <tr>
+            <th class="item-info">
+                <?= $block->escapeHtml(__('Items')) ?>
+            </th>
+            <th class="item-qty">
+                <?= $block->escapeHtml(__('Qty')) ?>
+            </th>
+        </tr>
+        </thead>
+        <?php $_items = $_shipment->getAllItems(); ?>
+        <?php $flag = [];
+        $addonIds = [];
+        $addonsByBundle = [];
+        foreach ($_items as $_item){
+            if ($_item->getOrderItem()->getProductType() == 'bundle') {
+                $addons = $addonHelper->getAddonList($_item->getOrderItem());
+                $addonsByBundle[$_item->getOrderItemId()] = $addons;
+                $addonIds = array_merge($addonIds, $addons);
+            }
+        }
+        ?>
+        <?php foreach ($_items as $_item) : ?>
+            <?php /** @var \Magento\Sales\Model\Order\Shipment\Item $_item ;*/?>
+            <?php if (!$_item->getOrderItem()->getParentItem()) : ?>
+                <?php if ($_item->getOrderItem()->getProductType() == 'bundle'):?>
+                    <tbody>
+                    <?php $bundleItemId = $_item->getOrderItemId() ?>
+                    <?php $bundleChild = $helper->getChildShipmentItems($bundleItemId) ?>
+                    <?php foreach ($bundleChild as $item): ?>
+                        <?= $block->getItemHtml($item); ?>
+                    <?php endforeach; ?>
+                    <?php if ($_item->getOrderItem()->getIsRepotNotRequire()) :
+                        $fakeRepot = $helper->getFakeRepotShipping($_item->getOrderItem()->getOrder()); ?>
+                        <?= $block->getItemHtml($fakeRepot); ?>
+                    <?php endif; ?>
+                    <?php $addonList = $addonsByBundle[$bundleItemId] ?? []; ?>
+                    <?php if (!empty($addonList)): ?>
+                        <?php foreach ($_items as $item): ?>
+                            <?php if(in_array($item->getProductId(), $addonList)): ?>
+                                <?php if (empty($flag[$item->getProductId()]) || (!$flag[$item->getProductId()])): ?>
+                                    <?= $block->getItemHtml($item); ?>
+                                    <?php $flag[$item->getProductId()] = true;?>
+                                <?php endif;?>
+                            <?php endif;  ?>
+                        <?php endforeach; ?>
+                    <?php endif;  ?>
+                    </tbody>
+                <?php else: ?>
+                    <?php if (!in_array($_item->getProductId(),$addonIds)): ?>
+                        <tbody>
+                        <?= $block->getItemHtml($_item) ?>
+                        </tbody>
+                    <?php endif; ?>
+                <?php endif; ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </table>
+<?php endif; ?>

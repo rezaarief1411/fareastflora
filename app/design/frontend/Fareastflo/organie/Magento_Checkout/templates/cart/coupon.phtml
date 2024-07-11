@@ -1,0 +1,88 @@
+<?php
+// $hasCouponCode = 0;
+$couponCodeList = (array) $block->getCouponList();
+$usedPoint = $block->getUsedPoint();
+$hasCouponCode = (bool) strlen($block->getUsedPoint());
+
+$writer = new \Zend_Log_Writer_Stream(BP.'/var/log/cart-coupon.log');
+$logger = new \Zend_Log();
+$logger->addWriter($writer);
+
+$isGuest = $block->isGuest();
+?>
+
+
+
+<div class="block discount boxed-checkout" id="block-discount" data-mage-init='{"collapsible":{"openedState": "active", "saveState": false, "active": true}}'>
+	<div class="block-title" data-role="title">
+		<h3 class="title" aria-level="2" role="heading" id="block-discount-heading"><span><?php /* @escapeNotVerified */ echo __('Apply Discount') ?></span></h3>
+	</div>
+    <div class="content" data-role="content" aria-labelledby="block-discount-heading">
+        <form id="discount-coupon-form"
+              action="<?php /* @escapeNotVerified */ echo $block->getUrl('checkout/cart/couponPost') ?>"
+              method="post"
+              data-mage-init='{"discountCode":{"couponCodeSelector": "#proseller_voucher",
+                                               "removeCouponSelector": "#remove-coupon",
+                                               "applyButton": "button.action.apply",
+                                               "cancelButton": "button.action.cancel"}}'>
+            <div class="fieldset coupon<?php strlen($block->getUsedPoint()) ? ' applied' : ''?>">
+                <input type="hidden" name="remove" id="remove-coupon" value="0" />
+                <div class="form-group">
+                    <div class="control">
+                        <!-- <input type="text" 
+                                class="input-text" 
+                                id="coupon_code"
+                                name="coupon_code" 
+                                value="<?php //echo $block->escapeHtml($block->getCouponCode()) ?>" 
+                                placeholder="<?php //echo $block->escapeHtml(__('Enter your coupon code')); ?>"
+                                <?php //if ($hasCouponCode):?>
+                                   disabled="disabled"
+                                <?php //endif; ?>
+                        /> -->
+                        <select id="proseller_voucher" name="proseller_voucher" placeholder="<?php echo $block->escapeHtml(__('Select voucher')); ?>"
+                            <?php if ($hasCouponCode):?>
+                                disabled="disabled"
+                            <?php endif; ?>
+                        >
+                            <option>Please select the voucher</option>
+                            <?php 
+                                if(count($couponCodeList) > 0){
+                                    foreach ($couponCodeList as $key => $value) {
+                                        $selected = '';
+                                        if($value["id"]==$usedPoint){
+                                            $selected= 'selected="selected"';
+                                        }
+                                        $voucherAmount = 0;
+                                        $voucherType = "";
+                                        if($value["type"]=="discPercentage"){
+                                            $voucherAmount = $value["value"]."%";
+                                            $voucherType = "%";
+                                        }elseif($value["type"]=="discAmount"){
+                                            $voucherAmount = $value["value"];
+                                        }
+                                        echo '<option '.$selected.'value="'.$value["id"].'|'.$value["name"].'|'.$voucherAmount.'|'.$voucherType.' ">'.$value["name"]." (".$value["count"].') </option>';
+                                    }
+                                }
+                            ?>
+                        </select>
+                        <div class="actions-toolbar">
+                            <?php if (!strlen($block->getUsedPoint())): ?>
+                            <div class="primary">
+                                <button class="action apply btn" type="button" value="<?php /* @escapeNotVerified */ echo __('Apply Voucher') ?>">
+                                    <span><?php /* @escapeNotVerified */ echo __('Apply Voucher') ?></span>
+                                </button>
+                            </div>
+                            <?php else: ?>
+                                <div class="primary">
+                                    <button  type="button" class="action cancel btn" value="<?php /* @escapeNotVerified */ echo __('Cancel Coupon') ?>"><span><?php /* @escapeNotVerified */ echo __('Cancel Coupon') ?></span></button>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>

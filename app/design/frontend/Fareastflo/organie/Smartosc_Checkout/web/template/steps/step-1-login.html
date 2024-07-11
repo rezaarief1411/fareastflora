@@ -1,0 +1,73 @@
+<li id="step_one_login" data-bind="fadeVisible: isVisible">
+<div class="step-title" data-bind="i18n: 'Log in or Create account'" data-role="title"></div>
+    <div id="checkout-step-title"
+         class="step-content"
+         data-role="content">
+        <div class="checkout-step-left">
+            <!--Login or create account-->
+            <div class="step-login-or-create-account-wrapper" data-bind="fadeVisible: visible(), blockLoader: isLoading" data-block="auth">
+                <form class="login-form form" data-mage-init='{"validation":{}}' method="post" action="#" autocomplete="off">
+                    <div class="title" data-bind="i18n: 'Registered Customers'"></div>
+                    <div class="sub-title" data-bind="i18n: 'If you have an account, sign in with your email address.'"></div>
+                    <div class="form-group row">
+                        <input type="text" name="username" autocomplete="username" class="form-control input-text required-entry" id="user_name" data-bind="attr: {text:getUserName(), placeholder:$t('User Name')}" required="required">
+                    </div>
+                    <div class="form-group row">
+                        <input type="text" name="password" autocomplete="current-password" class="form-control input-text required-entry" id="password" data-bind="attr: {placeholder: $t('Password')}" data-validate="{'required-entry':true}" required="required">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-login" data-bind="i18n: 'SignIn'"></button>
+                    <a class="link abutton" href="#" role="button" data-bind="i18n: 'Forgot password'"></a>
+                </form>
+            </div>
+
+            <!--promotion notice-->
+            <div class="promotion-ads" data-bind="html: window.checkoutConfig.cms_block"></div>
+        </div>
+
+        <div class="checkout-step-right">
+            <!--New Customers-->
+            <div class="step-new-customers">
+                <form class="register-form form" data-mage-init='{"validation":{}}' method="post" action="#" autocomplete="off">
+                    <div class="title" data-bind="i18n: 'New Customers'"></div>
+                    <div class="subtitle" data-bind="i18n: 'Creating an account has many benefits: check out faster, keep more than one address, track orders and more.'"></div>
+                    <div class="personal-information">
+                        <p data-bind="i18n: 'Personal Information'"></p>
+                        <div class="form-group row">
+                            <input type="text" name="first_name" id="first_name" class="form-control required-entry" data-bind="attr: {placeholder: $t('First Name')}" required="required"/>
+                        </div>
+                        <div class="form-group row">
+                            <input type="text" name="last_name" required="required" id="last_name" class="form-control required-entry" data-bind="attr: {placeholder: $t('Last Name')}"/>
+                        </div>
+                    </div>
+                    <div class="form-group form-check">
+                        <input checked type="checkbox" class="form-check-input" id="newsletter-sign-up">
+                        <label class="form-check-label" for="newsletter-sign-up" data-bind="i18n: 'Sign up for newsletter'"></label>
+                    </div>
+                    <div class="sign-in-information">
+                        <div class="title" data-bind="i18n: 'Sign-in Information'"></div>
+                        <div class="form-group row">
+                            <input type="email" name="email" id="email" required="required" class="form-control required-entry" data-bind="attr: {placeholder: $t('Email')}">
+                        </div>
+                        <div class="form-group row">
+                            <input type="password" name="password1" id="password1" required="required" class="form-control required-entry" data-bind="attr: {placeholder: $t('Password')}"/>
+                        </div>
+                        <div class="form-group row">
+                            <input type="password" class="form-control required-entry" id="password2" data-bind="attr: {placeholder: $t('Confirm password')}" name="password2">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" data-bind="i18n: 'Create an account'"></button>
+                    <button type="button" class="btn btn-link" data-bind="i18n: 'Continue as guest'"></button>
+                </form>
+            </div>
+        </div>
+        <form class="form-actions" data-bind="submit: navigateToNextStep" novalidate="novalidate">
+            <div class="actions-toolbar">
+                <div class="primary">
+                    <button data-role="opc-continue" type="submit" class="button action continue primary">
+                        <span><!-- ko i18n: 'Next'--><!-- /ko --></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</li>

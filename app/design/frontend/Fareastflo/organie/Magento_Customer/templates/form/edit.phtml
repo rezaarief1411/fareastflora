@@ -1,0 +1,329 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Magento\Customer\Block\Form\Edit $block */
+?>
+<?php
+$customer = $block->getCustomer();
+$dob = $customer->getDob();//YYYY-MM-DD
+
+$phoneNumber = !empty($customer->getCustomAttribute('phone_number')) ? $customer->getCustomAttribute('phone_number')->getValue() : '';
+$countryPhoneCode = !empty($customer->getCustomAttribute('country_phone_code')) ? $customer->getCustomAttribute('country_phone_code')->getValue() : '';
+$dob = str_replace("-", "/", $dob);
+$s_year = '';
+$s_month = '';
+$s_day = '';
+$current_year = date("Y");
+$current_year = (int)$current_year;
+if(!empty($dob)) {
+    $dob_arr = explode("/", $dob);
+    $s_year = intval($dob_arr[0]);
+    $s_month = intval($dob_arr[1]);
+    $s_day = intval($dob_arr[2]);
+}
+$validate = '';
+$validate = 'data-validate="{&quot;required&quot;:true}""';
+$customerHelper = $this->helper('\Smartosc\Customer\Helper\Data');
+
+?>
+<form class="form form-edit-account" action="<?php /* @escapeNotVerified */ echo $block->getUrl('customer/account/editPost') ?>" method="post" id="form-validate" enctype="multipart/form-data" data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>" autocomplete="off">
+    <fieldset class="fieldset info">
+        <?php echo $block->getBlockHtml('formkey')?>
+        <div class="block-title">
+			<h3 class="title"><span><?php /* @escapeNotVerified */ echo __('Account Information') ?></span></h3>
+		</div>
+        <?php echo $block->getLayout()->createBlock('Magento\Customer\Block\Widget\Name')->setObject($block->getCustomer())->toHtml() ?>
+
+        <?php $_dob = $block->getLayout()->createBlock('Magento\Customer\Block\Widget\Dob') ?>
+        <?php $_taxvat = $block->getLayout()->createBlock('Magento\Customer\Block\Widget\Taxvat') ?>
+        <?php $_gender = $block->getLayout()->createBlock('Magento\Customer\Block\Widget\Gender') ?>
+        <?php if ($_dob->isEnabled()): ?>
+            <?php //echo $_dob->setDate($block->getCustomer()->getDob())->toHtml() ?>
+
+        <div class="field date field-dob">
+            <label for="dob" class="label">
+                <span class="has-tooltip"><?php /* @escapeNotVerified */ echo __('Date of birth*') ?>:</span>
+                <div class="tooltip-icon fa-question-circle">
+                    <div class="tooltip-text"><p><?php echo __($customerHelper->getDobTooltipLabel()) ?></p></div>
+                </div>
+
+            </label>
+
+            <div class="field dob customer-dob">
+                <input type="hidden" class="" value="<?php echo $s_month."/".$s_day."/".$s_year; ?>" id="dob" name="dob" autocomplete="off">
+                <div class="date-time">
+                    <div class="dob-day">
+                        <select id="dob_dd" name="day" title="<?php /* @escapeNotVerified */ echo __('DD') ?>" <?php echo $validate;?>>
+                            <option value=""><?php /* @escapeNotVerified */ echo __('DD') ?></option>
+                            <?php for($day=1;$day<=31;$day++):?>
+                                <option value="<?php /* @escapeNotVerified */ echo __($day) ?>" <?php if ($day == $s_day) echo ' selected="selected"' ?> ><?php /* @escapeNotVerified */ echo __($day) ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+                    <div class="dob-month">
+                        <select id="dob_mm" name="month" title="<?php /* @escapeNotVerified */ echo __('mm') ?>" <?php echo $validate;?>>
+                            <option value=""><?php /* @escapeNotVerified */ echo __('Month') ?></option>
+                            <?php for($month=1;$month<=12;$month++):?>
+                                <option value="<?php /* @escapeNotVerified */ echo __($month) ?>" <?php if ($month == $s_month) echo ' selected="selected"' ?> ><?php /* @escapeNotVerified */ echo __($month) ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+                    <div class="dob-year">
+                        <select id="dob_yy" name="year" title="<?php /* @escapeNotVerified */ echo __('yyyy') ?>" <?php echo $validate;?>>
+                            <option value=""><?php /* @escapeNotVerified */ echo __('Year') ?></option>
+                            <?php for($year=1950;$year<=$current_year;$year++):?>
+                                <option value="<?php /* @escapeNotVerified */ echo __($year) ?>" <?php if ($year == $s_year) echo ' selected="selected"' ?> ><?php /* @escapeNotVerified */ echo __($year) ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+                </div>
+                <input type="text" data-validate="{'validate-date-dob':true}" id="dob-validate" name="dob-validate" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="field field-phone required">
+            <label class="label" for="phone"><span><?= $block->escapeHtml(__('Phone Number')) ?></span></label>
+            <div class="control customer-phone">
+                <input type="text" value="<?php echo $countryPhoneCode; ?>" class="input-text required-entry" id="country-calling-codes" name="country_phone_code" aria-required="true" />
+                <input type="text" value="<?php echo $phoneNumber; ?>" class="input-text required-entry" id="phone" name="phone_number" aria-required="true" />
+            </div>
+        </div>
+
+        <?php endif ?>
+        <?php if ($_taxvat->isEnabled()): ?>
+            <?php echo $_taxvat->setTaxvat($block->getCustomer()->getTaxvat())->toHtml() ?>
+        <?php endif ?>
+        <?php if ($_gender->isEnabled()): ?>
+            <?php echo $_gender->setGender($block->getCustomer()->getGender())->toHtml() ?>
+        <?php endif ?>
+        <div class="form-group choice checkbox">
+            <input type="checkbox" name="change_email" id="change-email" data-role="change-email" value="1" title="<?php /* @escapeNotVerified */ echo __('Change Email') ?>" class="checkbox" />
+            <label for="change-email"><?php /* @escapeNotVerified */ echo __('Change Email') ?></label>
+        </div>
+        <div class="field email required">
+            <div class="form-group " data-container="change-email">
+                <div class="control">
+                    <input style="margin-top:30px;" placeholder="<?php /* @escapeNotVerified */ echo __('Email') ?>" type="text" name="email" id="email" autocomplete="email" data-input="change-email" value="<?php echo $block->escapeHtml($block->getCustomer()->getEmail()) ?>" title="<?php /* @escapeNotVerified */ echo __('Email') ?>" class="input-text" data-validate="{required:true, 'validate-email':true}" required />
+                    <label class="label" for="email"><?php /* @escapeNotVerified */ echo __('Email') ?></label>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <div class="field">
+        <div class="form-group">
+            <div class="control">
+                <input name="update[otp]" placeholder="OTP" value="" id="update-otp" type="text" style="display:none;" class="input-text" title="<?php /* @escapeNotVerified */ echo __('OTP') ?>" data-validate="{required:true}" required>
+                <a class="margin-left15 action request" href="" id="update-request-otp" style="display:none"><span><?php /* @escapeNotVerified */ echo __('Request OTP') ?></span></a>
+            </div>
+        </div>
+    </div>
+    <div class="field note margin-bottom10"  id="update-validation-info" style="background-color:#edd8a1;display:none"><?php /* @escapeNotVerified */ echo __('Please input OTP that has been sent in your email.') ?></div>
+    <div class="field note margin-bottom10"  id="update-validation-error" style="color:red"></div>
+    <div class="actions-toolbar">
+        <div class="primary">
+            <button type="submit" style="display:none;" class="action save primary btn btn-primary btn-lg" title="<?php /* @escapeNotVerified */ echo __('Save') ?>"><span><?php /* @escapeNotVerified */ echo __('Save') ?></span></button>
+        </div>
+        <div class="secondary padding-top10">
+            <a class="action back" href="<?php echo $block->escapeUrl($block->getBackUrl()) ?>"><span><?php /* @escapeNotVerified */ echo __('Go back') ?></span></a>
+        </div>
+    </div>
+</form>
+<button id="btn-request" class="action primary btn btn-primary btn-lg" title="<?php /* @escapeNotVerified */ echo __('Save') ?>"><span><?php /* @escapeNotVerified */ echo __('Save') ?></span></button>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Customer/js/validation": {}
+        }
+    }
+</script>
+<script>
+    require([
+        'jquery',
+        'jquery/ui',
+        'jquery/validate',
+        "mage/mage"
+    ], function($){
+        var dataForm = $('#form-validate');
+        var ignore = <?php /* @escapeNotVerified */ echo $_dob->isEnabled() ? '\'input[id$="full"]\'' : 'null'; ?>;
+
+        $('#update-otp').hide();
+
+        dataForm.mage('validation', {
+        <?php if ($_dob->isEnabled()): ?>
+            errorPlacement: function(error, element) {
+                if (element.prop('id').search('full') !== -1) {
+                    var dobElement = $(element).parents('.customer-dob'),
+                        errorClass = error.prop('class');
+                    error.insertAfter(element.parent());
+                    dobElement.find('.validate-custom').addClass(errorClass)
+                        .after('<div class="' + errorClass + '"></div>');
+                }
+                else {
+                    error.insertAfter(element);
+                }
+            },
+            ignore: ':hidden:not(' + ignore + ')'
+        <?php else: ?>
+            ignore: ignore ? ':hidden:not(' + ignore + ')' : ':hidden'
+        <?php endif ?>
+        });
+
+
+        $.validator.addMethod(
+            'validate-date-dob', function (v) {
+                if(!v) return true;
+                var regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+                if(!regex.test(v)) return false;
+                var d = new Date(v.replace(regex, '$1/$2/$3'));
+                return ( parseInt(RegExp.$1, 10) == (1+d.getMonth()) ) &&
+                    (parseInt(RegExp.$2, 10) == d.getDate()) &&
+                    (parseInt(RegExp.$3, 10) == d.getFullYear() );
+
+
+            },'<?= __('Please enter a valid date.') ?>');
+
+        $(".customer-dob .date-time select").each(function(){
+            $(this).on('change',function() {
+                fortmatDateDob();
+            })
+        })
+
+        $("#btn-request").click(function(e) {
+            var buttonText = $(this).text();
+            if(buttonText=="Save"){
+                $("#update-otp").show();
+                $("#update-request-otp").show();
+                $("#btn-request").html("Submit");
+            } else{
+                
+                if($(".form-edit-account").valid()){
+                    validateOtp();
+                    $("#update-otp").hide();
+                    $("#update-request-otp").hide();
+                    $("#btn-request").html("Save");
+                }else{
+                    $("#update-request-otp").hide();
+                    alert("Please fill the required fields");
+                }
+            }
+        })
+
+        $('#update-request-otp').click(function (e) {
+                e.preventDefault();
+                if($("#email").val()==""){
+                    alert("Please fill the email first");
+                }else{
+                    $.ajax({
+                        url: '/sso/customer/resendotp',
+                        cache: false,
+                        showLoader: true,
+                        type: 'POST',
+                        data: {
+                            "email" : $("#email").val(),
+                        },
+                        success: function (response) {
+                            console.log(response);
+                            if(response.success==true){   
+                                $('#update-validation-info').text(response.message);
+                                $('#update-validation-info').show();
+                                $('#update-validation-error').hide();
+                                $("#update-request-otp").show();
+                                $('#update-otp').show();
+                            } else {
+                                $('#update-validation-error').show();
+                                $('#update-validation-error').text(response.message);
+                                $('#update-validation-info').hide();
+                                $("#update-request-otp").hide();
+                                $('#update-otp').hide();
+                            }
+                        },
+                        fail: function (response) {
+                            console.log("failed");
+                            console.log(response);
+                        }
+                    });
+                } 
+            })
+
+        
+            $(".form-edit-account").submit(function(e) {
+            if($("#dob_yy").val() && $("#dob_mm").val() && $("#dob_dd").val()) {
+                fortmatDateDob();
+            }
+        })
+
+        function fortmatDateDob() {
+            let month = $("#dob_mm").val();
+            let day = $("#dob_dd").val();
+            let year = $("#dob_yy").val();
+            $('input[id=dob]').val(month + '/' + day + '/' + year);
+            let dayConvert = day;
+            if(dayConvert < 10) {
+                dayConvert = '0' + day;
+            }
+            let monthConvert = month;
+            if(monthConvert < 10) {
+                monthConvert = '0' + monthConvert;
+            }
+            $('#dob-validate').val(monthConvert + '/' + dayConvert  + '/' + year);
+        }
+
+        function validateOtp(){
+            $('#update-validation-info').hide();
+            $('#update-validation-error').hide();
+
+            $.ajax({
+                url: '/sso/customer/validateotp',
+                cache: false,
+                showLoader: true,
+                type: 'POST',
+                data: {
+                    "otp" : $("#update-otp").val(),
+                },
+                success: function (response) {
+                    console.log(response);
+                    if(response.success==true){   
+                        $('#update-validation-info').text(response.message);
+                        $('#update-validation-info').show();
+                        $('#update-validation-error').hide();
+                        $(".form-edit-account").submit();
+                        $('#update-otp').hide();
+                        $("#update-request-otp").hide();
+                    } else {
+                        $('#update-validation-error').show();
+                        $('#update-validation-error').text(response.message);
+                        $('#update-validation-info').hide();
+                        $('#update-otp').show();
+                        $("#update-request-otp").show();
+                    }
+                },
+                fail: function (response) {
+                    console.log("failed");
+                    console.log(response);
+                }
+            });
+        }
+    });
+    
+</script>
+<script type="text/x-magento-init">
+    {
+        "[data-role=change-email], [data-role=change-password]": {
+            "changeEmailPassword": {
+                "titleChangeEmail": "<?php /* @escapeNotVerified */ echo __('Change Email') ?>",
+                "titleChangePassword": "<?php /* @escapeNotVerified */ echo __('Change Password') ?>",
+                "titleChangeEmailAndPassword": "<?php /* @escapeNotVerified */ echo __('Change Email and Password') ?>"
+            }
+        }
+    }
+</script>
+<script>
+    require(["jquery", "jquery/ui", "Zoku_Customer/js/phone-input"], function ($) {
+        $("#country-calling-codes").intlTelInput();
+    });
+</script>

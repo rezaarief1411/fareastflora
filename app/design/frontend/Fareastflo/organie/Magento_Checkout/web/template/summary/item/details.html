@@ -1,0 +1,67 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<!-- ko foreach: getRegion('before_details') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+<!-- /ko -->
+<div class="product-item-details">
+
+    <div class="product-item-inner">
+        <div class="product-item-name-block">
+            <strong class="product-item-name" data-bind="text: $parent.name"></strong>
+            <div class="details-qty">
+                <span class="label"><!-- ko i18n: 'x' --><!-- /ko --></span>
+                <!-- ko if: ($parents[1].extension_attributes && $parents[1].extension_attributes.product_type && $parents[1].extension_attributes.product_type == 'bundle') -->
+                <span class="value" data-bind="text: $parents[1].qty"></span>
+                <!-- /ko -->
+                <!-- ko ifnot: ($parents[1].extension_attributes && $parents[1].extension_attributes.product_type && $parents[1].extension_attributes.product_type == 'bundle') -->
+                <span class="value" data-bind="text: $parent.qty"></span>
+                <!-- /ko -->
+            </div>
+            <dl class="product-item-code">
+                <!-- ko foreach: window.checkoutConfig.quoteItemData -->
+                <!-- ko if: item_id == $parents[1].item_id -->
+                    <dt class="label" data-bind="i18n: 'Item Code:'"></dt><!-- ko text: sku --><!-- /ko -->
+                <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: ($parents[1] && $parents[1].extension_attributes && $parents[1].extension_attributes.product_type == 'bundle') -->
+                <dt class="label" data-bind="i18n: 'Item Code:'"></dt>
+                <!-- ko if: $parent.extension_attributes.sku -->
+                <!-- ko text: $parent.extension_attributes.sku --><!-- /ko --><!-- /ko -->
+                <!-- /ko -->
+            </dl>
+        </div>
+        <!-- ko foreach: getRegion('after_details') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+    </div>
+
+    <!-- ko if: (JSON.parse($parent.options).length > 0)-->
+    <div class="product options">
+        <span data-role="title" class="toggle"><!-- ko i18n: 'View Details' --><!-- /ko --></span>
+        <div data-role="content" class="content">
+            <strong class="subtitle"><!-- ko i18n: 'Options Details' --><!-- /ko --></strong>
+            <dl class="item-options">
+                <!--ko foreach: JSON.parse($parent.options)-->
+                <dt class="label" data-bind="text: label"></dt>
+                    <!-- ko if: ($data.full_view)-->
+                    <dd class="values" data-bind="html: full_view"></dd>
+                    <!-- /ko -->
+                    <!-- ko ifnot: ($data.full_view)-->
+                        <!-- ko ifnot: (value.includes("#"))-->
+                        <dd class="values" data-bind="html: value"></dd>
+                        <!-- /ko -->
+                        <!-- ko if: (value.includes("#"))-->
+                            <dd class="values" data-bind="css: 'color', style: {'background-color': value}"></dd>
+                        <!-- /ko -->
+                    <!-- /ko -->
+                <!-- /ko -->
+            </dl>
+        </div>
+    </div>
+    <!-- /ko -->
+</div>

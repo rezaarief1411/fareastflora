@@ -1,0 +1,78 @@
+<?php
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+?>
+<?php /* @var $block \Magento\Customer\Block\Widget\Name */
+
+$help= $this->helper(\MGS\Mpanel\Helper\Data::class);
+
+$firstName = $help->isLoggedIn() ? $block->getObject()->getFirstname() : '';
+$lastName = $help->isLoggedIn() ? $block->getObject()->getLastname() : '';
+$prefix = $block->showPrefix();
+$prefixValue = $block->getObject() ?  $block->getObject()->getPrefix() : '';
+?>
+
+<div class="row customer-name-fields">
+        <div class="field required fullname <?= /* @escapeNotVerified */  $block->getContainerClassName() ?>">
+            <div class="control">
+	            <?php if ($prefix): ?>
+		            <div class="field field-name-prefix<?php if ($block->isPrefixRequired()) echo ' required' ?>">
+			            <label class="label" for="<?php /* @escapeNotVerified */ echo $block->getFieldId('prefix') ?>">
+				            <span><?php /* @escapeNotVerified */ echo $block->getStoreLabel('prefix') ?></span>
+			            </label>
+
+			            <div class="control">
+				            <?php if ($block->getPrefixOptions() === false): ?>
+					            <input type="text" id="<?php /* @escapeNotVerified */ echo $block->getFieldId('prefix') ?>"
+					                   name="<?php /* @escapeNotVerified */ echo $block->getFieldName('prefix') ?>"
+					                   value="<?php echo $block->escapeHtml($block->getObject()->getPrefix()) ?>"
+					                   title="<?php /* @escapeNotVerified */ echo $block->getStoreLabel('prefix') ?>"
+					                   class="input-text <?php /* @escapeNotVerified */ echo $block->getAttributeValidationClass('prefix') ?>" <?php /* @escapeNotVerified */ echo $block->getFieldParams() ?> <?php if ($block->isPrefixRequired()) echo ' data-validate="{required:true}"' ?>>
+				            <?php else: ?>
+					            <select id="<?php /* @escapeNotVerified */ echo $block->getFieldId('prefix') ?>"
+					                    name="<?php /* @escapeNotVerified */ echo $block->getFieldName('prefix') ?>"
+					                    title="<?php /* @escapeNotVerified */ echo $block->getStoreLabel('prefix') ?>"
+					                    class="<?php /* @escapeNotVerified */ echo $block->getAttributeValidationClass('prefix') ?>" <?php /* @escapeNotVerified */ echo $block->getFieldParams() ?> <?php if ($block->isPrefixRequired()) echo ' data-validate="{required:true}"' ?> >
+						            <?php foreach ($block->getPrefixOptions() as $_option): ?>
+							            <option value="<?php /* @escapeNotVerified */ echo $_option ?>"<?php if ($prefixValue == $_option): ?> selected="selected"<?php endif; ?>>
+								            <?php /* @escapeNotVerified */ echo __($_option) ?>
+							            </option>
+						            <?php endforeach; ?>
+					            </select>
+				            <?php endif; ?>
+			            </div>
+		            </div>
+	            <?php endif; ?>
+                <fieldset class="fieldset fieldset-fullname">
+                    <div class="field field-name-firstname required">
+                        <div class="control">
+                            <input type="text" id="<?= /* @escapeNotVerified */  $block->getFieldId('firstname') ?>"
+                            name="<?= /* @escapeNotVerified */  $block->getFieldName('firstname') ?>"
+                            placeholder="<?= /* @escapeNotVerified */  $block->getStoreLabel('firstname') ?>"
+                                   title="<?= /* @escapeNotVerified */  $block->getStoreLabel('firstname') ?>"
+                                   value="<?= $block->escapeHtmlAttr($firstName)?>"
+                                   class="input-text <?= /* @escapeNotVerified */  $block->getAttributeValidationClass('firstname') ?>"
+                                   required >
+                            <label class="label" for="<?= /* @escapeNotVerified */  $block->getFieldId('firstname') ?>"><span><?= /* @escapeNotVerified */  $block->getStoreLabel('firstname') ?></span></label>
+                        </div>
+                    </div>
+                    <div class="field field-name-lastname required">
+                        <div class="control">
+                            <input type="text" id="<?= /* @escapeNotVerified */  $block->getFieldId('lastname') ?>"
+                            name="<?=  /* @escapeNotVerified */  $block->getFieldName('lastname')?>"
+                            placeholder="<?=  /* @escapeNotVerified */  $block->getStoreLabel('lastname')?>"
+                            value="<?= $block->escapeHtmlAttr($lastName)?>"
+                                   title="<?= /* @escapeNotVerified */  $block->getStoreLabel('lastname') ?>"
+                            class="input-text <?= /* @escapeNotVerified */  $block->getAttributeValidationClass('lastname')?>"
+                                   data-validate='{required:true}' required>
+                            <label class="label" for="<?= /* @escapeNotVerified */  $block->getFieldId('lastname') ?>"><span><?= /* @escapeNotVerified */  $block->getStoreLabel('lastname') ?></span></label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+</div>

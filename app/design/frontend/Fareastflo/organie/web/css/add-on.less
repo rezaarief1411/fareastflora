@@ -1,0 +1,327 @@
+@color: #295135;
+@screen__ip5: 320px;
+@screen__s5: 360px;
+@screen__xxs: 380px;
+@screen__xs: 480px;
+@screen__s: 640px;
+@screen__m: 768px;
+@screen__l: 1024px;
+@screen__xl: 1440px;
+
+//
+//  Common
+//  _____________________________________________
+.catalog-product-view {
+    .block.add-on#block-add-on {
+        margin-top: 10px;
+        .title-block {
+            padding-bottom: 0;
+            margin-bottom: 0;
+            #block-add-on-heading {
+                font-size: 2rem;
+                font-weight: 400;
+                text-align: left;
+            }
+            h2:after {
+                left: 0;
+                transform: unset;
+                width: 105px;
+            }
+        }
+        .block-content.content {
+            .add-on-slider {
+                .slick-arrow.fa {
+                    top: calc(30%);
+                }
+            }
+            .action.tocompare{
+                display: none;
+            }
+            .product-item-info:hover .product-image-photo {
+                transform: none;
+                -webkit-transform: none;
+                -ms-transform: none;
+            }
+            .product-item-info {
+                .stock.unavailable {
+                    padding: 5px 10px;
+                    top: -15px;
+                    right: -15px;
+                    left: unset;
+                }
+                .product-label.sale-label {
+                    top: -15px;
+                    right: -15px;
+                }
+            }
+            .product-add-on-detail {
+                .product-image-container {
+                    width: 100%;
+                }
+                .checkbox-container {
+                    position: relative;
+                    text-align: left;
+                    text-indent: 25px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    input[type="checkbox"] {
+                        margin: 0;
+                        position: absolute;
+                        opacity: 0;
+                        cursor: pointer;
+                        height: 0;
+                        width: 0;
+                    }
+                    input[type="checkbox"][disabled] {
+                        background: #ccc;
+                    }
+                    .checkmark {
+                        position: absolute;
+                        top: 0;
+                        left: 2px;
+                        height: 18px;
+                        width: 18px;
+                        background-color: #fff;
+                        border: 1px solid #000;
+                        border-radius: 5px;
+                    }
+                    .checkmark::after {
+                        content: "";
+                        position: absolute;
+                        display: none;
+                    }
+                    .checkmark::after {
+                        left: 5px;
+                        top: 2px;
+                        width: 8px;
+                        height: 12px;
+                        border: solid white;
+                        border-width: 0 4px 4px 0;
+                        -webkit-transform: rotate(45deg);
+                        -ms-transform: rotate(45deg);
+                        transform: rotate(45deg);
+                    }
+                    >h4 {
+                        width: 100%;
+                        margin: 10px 0;
+                    }
+                }
+                .checkbox-inner {
+                    position: relative;
+                    margin-top: 1rem;
+                }
+                .price-box .price {
+                    font-size: 18px !important;
+                    line-height: 15px
+                }
+                .checkbox-container input:checked ~ .checkbox-inner .checkmark {
+                    background-color: @color;
+                    border: none;
+                }
+                .checkbox-container input:disabled ~ .checkbox-inner .checkmark {
+                    background-color: #ccc;
+                    border: none;
+                }
+                .checkbox-container input:checked ~ .checkbox-inner .checkmark:after {
+                    display: block;
+                }
+                .checkbox-input:checked ~ .product-image-container {
+                    border: 1px solid @color;
+                }
+            }
+        }
+    }
+}
+//
+//  Ipad Pro
+//  _____________________________________________
+@media (max-width: @screen__l) {
+    .catalog-product-view {
+        .block.add-on#block-add-on {
+            .block-content.content {
+                .add-on-slider {
+                    .slick-arrow.fa {
+                        top: calc(30%);
+                    }
+                }
+                .product-item-info {
+                    .stock.unavailable {
+                        left: 15px;
+                    }
+                }
+                .product-add-on-detail {
+                    .checkbox-container {
+                        .checkmark {
+                            top: 0;
+                            height: 16px;
+                            width: 16px;
+                        }
+                        .checkmark::after {
+                            border-width: 0 3px 3px 0;
+                            width: 6px;
+                            height: 10px;
+                        }
+                        h4 {
+                            font-size: 15px;
+                            text-indent: 20px;
+                        }
+                    }
+                    .product-item-name {
+                        margin-bottom: 10px;
+                    }
+                    .product-item-name::after {
+                        bottom: -5px;
+                        margin-top: 0;
+                    }
+                    .price-box .price {
+                        font-size: 18px !important;
+                        line-height: 15px;
+                    }
+                }
+            }
+        }
+    }
+}
+//
+//  Ipad
+//  _____________________________________________
+@media (max-width: @screen__m) {
+    .catalog-product-view {
+        .block.add-on#block-add-on {
+            .block-content.content {
+                .product-item-info {
+                    .stock.unavailable {
+                        left: 45px;
+                        top: 10px;
+                        right: -5px;
+                    }
+                    .product-label.sale-label {
+                        top: 10px;
+                        right: -5px;
+                    }
+                }
+                .product-add-on-detail {
+                    .checkbox-container {
+                        .checkmark {
+                            top: 0;
+                        }
+                    }
+                    .price-box .price {
+                        font-size: 20px !important;
+                        margin-right: 0;
+                    }
+                }
+            }
+        }
+    }
+}
+//
+//  Mobile
+//  _____________________________________________
+@media (max-width: @screen__xs) {
+    .catalog-product-view {
+        .block.add-on#block-add-on {
+            .block-content.content {
+                .product-item-info {
+                    .stock.unavailable {
+                        top: 15px;
+                        right: 0;
+                    }
+                    .product-label.sale-label {
+                        top: 15px;
+                        right: 0;
+                    }
+                }
+                .product-add-on-detail {
+                    .checkbox-container {
+                        text-indent: 23px;
+                        .checkmark {
+                            top: 0;
+                            height: 14px;
+                            width: 14px;
+                            border-radius: 4px;
+                        }
+                        .checkmark::after {
+                            left: 4px;
+                            top: 1px;
+                            width: 7px;
+                            height: 10px;
+                            border-width: 0 3px 3px 0;
+                        }
+                        h4 {
+                            min-height: 35px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+@media (max-width: @screen__xxs) {
+    .catalog-product-view {
+        .block.add-on#block-add-on {
+            .block-content.content {
+                .product-item-info {
+                    .stock.unavailable {
+                        left: 25px;
+                    }
+                }
+                .product-add-on-detail {
+                    .checkbox-container {
+                        text-indent: 20px;
+                        .checkmark {
+                            left: 0px;
+                            top: 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+@media (max-width: @screen__s5) {
+    .catalog-product-view {
+        .block.add-on#block-add-on {
+            .block-content.content {
+                .product-item-info {
+                    .stock.unavailable {
+                        left: 20px;
+                    }
+                }
+                .product-add-on-detail {
+                    .checkbox-container {
+                        text-indent: 20px;
+                        .checkmark {
+                            top: 0;
+                        }
+                    }
+                    .price-box .price {
+                        font-size: 15px !important;
+                    }
+                }
+            }
+        }
+    }
+}
+@media (max-width: @screen__ip5) {
+    .catalog-product-view {
+        .block.add-on#block-add-on {
+            .block-content.content {
+                .product-item-info {
+                    .stock.unavailable {
+                        left: 0;
+                    }
+                }
+                .product-add-on-detail {
+                    .checkbox-container {
+                        .checkmark {
+                            top: 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

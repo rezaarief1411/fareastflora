@@ -1,0 +1,8 @@
+<?php
+$flowerHelper = $this->helper("Smartosc\Mpanel\Helper\FallingFlowerHelper");
+?>
+<ul class="g-snows" id="jsi-snows">
+    <?php for ($i = 0; $i < 7; $i++): ?>
+    <li style="background: url(<?=$flowerHelper->getFallingImageUrl()?>)"></li>
+    <?php endfor; ?>
+</ul>

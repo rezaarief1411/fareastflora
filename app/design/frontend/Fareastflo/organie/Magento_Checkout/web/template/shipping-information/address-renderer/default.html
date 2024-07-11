@@ -1,0 +1,63 @@
+<if args="visible()">
+    <if args="window.deliveryTab">
+        <if args="address().firstname">
+            <span class="firstname" data-bind="text: address().firstname +' '+ address().lastname"></span>
+        </if>
+        <if args="address().street">
+            <span class="address">
+                <text args="_.values(address().street).join(', ')"/>
+                <if args="address().customAttributes && address().customAttributes.billing_floor">
+                    , <text args="address().customAttributes.billing_floor"/>
+                </if>
+                <if args="address().customAttributes && address().customAttributes.billing_building">
+                    , <text args="address().customAttributes.billing_building"/>
+                </if>
+                , <text args="getCountryName(address().countryId)"/>
+                <text args="address().postcode"/>
+            </span>
+        </if>
+        <if args="address().telephone"><span class="telephone"><a attr="'href': 'tel:' + address().telephone" text="address().telephone"></a></span></if>
+        <if args="address().customAttributes && address().customAttributes.delivery_date">
+            <span class="calendar" text="address().customAttributes.delivery_date"></span>
+        </if>
+        <if args="address().customAttributes && address().customAttributes.delivery_note">
+            <span class="note wrap-word" text="address().customAttributes.delivery_note"></span>
+        </if>
+        <if args="address().customAttributes && address().customAttributes.authorize_message">
+            <span class="note authorize-message" text="address().customAttributes.authorize_message"></span>
+        </if>
+        <if args="address().customAttributes && address().customAttributes.gift_message">
+            <span class="note gift-message wrap-word" text="address().customAttributes.gift_message"></span>
+        </if>
+    </if>
+    <if args="window.pickupTab">
+        <if args="address().firstname">
+            <span class="firstname" data-bind="text: address().firstname +' '+ address().lastname"></span>
+        </if>
+        <if args="address().street">
+            <span class="address">
+                <text args="_.values(address().street).join(', ')"/>
+                <if args="address().customAttributes && address().customAttributes.billing_floor">
+                    , <text args="address().customAttributes.billing_floor"/>
+                </if>
+                <if args="address().customAttributes && address().customAttributes.billing_building">
+                    , <text args="address().customAttributes.billing_building"/>
+                </if>
+                , <text args="getCountryName(address().countryId)"/>
+                <text args="address().postcode"/>
+            </span>
+        </if>
+        <if args="address().telephone"><span class="telephone"><a attr="'href': 'tel:' + address().telephone" text="address().telephone"></a></span></if>
+        <if args="pickupDate() && window.pickupTab">
+            <span class="calendar">
+                <text args="pickupDate()"/> | <text args="address().customAttributes.pickup_time"/>
+            </span>
+        </if>
+        <if args="pickupNote() && window.pickupTab">
+            <span class="note" data-bind="text: pickupNote()"></span>
+        </if>
+        <if args="address().customAttributes && address().customAttributes.gift_message">
+            <span class="note gift-message wrap-word" data-bind="text: address().customAttributes.gift_message"></span>
+        </if>
+    </if>
+</if>

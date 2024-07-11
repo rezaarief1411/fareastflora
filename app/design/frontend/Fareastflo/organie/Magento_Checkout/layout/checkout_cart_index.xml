@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<body>
+    <referenceBlock name="checkout.cart.shipping">
+        <arguments>
+            <argument name="jsLayout" xsi:type="array">
+                <item name="components" xsi:type="array">
+                    <item name="block-summary" xsi:type="array">
+                        <item name="children" xsi:type="array">
+                            <item name="block-shipping" xsi:type="array">
+                                <item name="children" xsi:type="array">
+                                    <item name="address-fieldsets" xsi:type="array">
+                                        <item name="children" xsi:type="array">
+                                            <item name="region_id" xsi:type="array">
+                                                <item name="config" xsi:type="array">
+                                                    <item name="componentDisabled" xsi:type="boolean">true</item>
+                                                </item>
+                                            </item>
+                                            <item name="region" xsi:type="array">
+                                                <item name="config" xsi:type="array">
+                                                    <item name="componentDisabled" xsi:type="boolean">true</item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </referenceBlock>
+    <referenceContainer name="cart.bottom.col1" htmlTag="div" htmlClass="col-md-4 col-sm-6 col-xs-12"/>
+    <referenceContainer name="cart.bottom.col2" htmlTag="div" htmlClass="col-md-8 col-sm-6 col-xs-12 pull-right"/>
+
+    <referenceBlock name="checkout.cart.validationmessages" remove="true" />
+</body>

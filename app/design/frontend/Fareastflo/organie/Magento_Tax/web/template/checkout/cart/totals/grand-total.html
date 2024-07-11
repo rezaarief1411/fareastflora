@@ -1,0 +1,52 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!-- ko if: isTaxDisplayedInGrandTotal && isDisplayed() -->
+<tr class="order totals" data-bind="attr: {class: getTotalSaving() ? 'order totals has-saving' : 'order totals'}">
+    <td data-block="dropdownTotal" colspan="2">
+        <div class="incl">
+            <!-- ko if: getTotalSaving() -->
+            <div class="totals saving"><span class="price" data-bind="text: getTotalSaving()"></span></div>
+            <!-- /ko -->
+            <div class="mark" scope="row">
+                <strong data-trigger=triggerTotal data-bind="i18n: inclTaxLabel"></strong>
+            </div>
+            <div data-bind="attr: {'data-th': inclTaxLabel}" class="amount">
+                <strong><span class="price" data-bind="text: getValue()"></span></strong>
+            </div>
+        </div>
+        <div class="excl">
+            <div class="tax">
+                <div class="mark" scope="row">
+                    <strong data-bind="text: getTaxPercent()"></strong>
+                </div>
+                <div data-bind="attr: {'data-th': getTaxPercent()}" class="amount">
+                    <strong><span class="price" data-bind="text: getTaxMount()"></span></strong>
+                </div>
+            </div>
+            <div class="grand">
+                <div class="mark" scope="row">
+                    <strong data-bind="i18n: exclTaxLabel"></strong>
+                </div>
+                <div data-bind="attr: {'data-th': exclTaxLabel}" class="amount">
+                    <strong><span class="price" data-bind="text: getGrandTotalExclTax()"></span></strong>
+                </div>
+            </div>
+        </div>
+        <div data-bind="afterRender: loadDropdown"></div></td>
+    </td>
+</tr>
+<!-- /ko -->
+<!-- ko if: !isTaxDisplayedInGrandTotal && isDisplayed() -->
+<tr class="grand totals">
+    <th class="mark" scope="row">
+        <strong data-bind="i18n: title"></strong>
+    </th>
+    <td data-bind="attr: {'data-th': title}" class="amount">
+        <strong><span class="price" data-bind="text: getValue()"></span></strong>
+    </td>
+</tr>
+<!-- /ko -->

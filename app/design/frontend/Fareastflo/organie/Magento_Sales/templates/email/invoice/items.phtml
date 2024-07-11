@@ -1,0 +1,87 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+/** @var \Smartosc\CustomBundleProduct\Helper\CartItemHelper $addonHelper */
+$addonHelper = $this->helper(\Smartosc\CustomBundleProduct\Helper\CartItemHelper::class);
+?>
+<?php $_invoice = $block->getInvoice() ?>
+<?php $_order = $block->getOrder() ?>
+<?php /** @var \Smartosc\Sales\ViewModel\Email\InvoiceItems $viewModel */
+$viewModel = $block->getViewModel()->setOrder($_order); ?>
+<?php if ($_invoice && $_order) : ?>
+    <table class="email-items">
+        <thead>
+        <tr>
+            <th class="item-info">
+                <?= $block->escapeHtml(__('Items')) ?>
+            </th>
+            <th class="item-qty">
+                <?= $block->escapeHtml(__('Qty')) ?>
+            </th>
+            <th class="item-subtotal">
+                <?= $block->escapeHtml(__('Subtotal')) ?>
+            </th>
+        </tr>
+        </thead>
+        <?php $_items = $_invoice->getAllItems(); ?>
+        <?php $flag = [];
+        $addonIds = [];
+        $addonsByBundle = [];
+        foreach ($_items as $_item){
+            if ($_item->getOrderItem()->getProductType() == 'bundle') {
+                $addons = $addonHelper->getAddonList($_item->getOrderItem());
+                $addonsByBundle[$_item->getOrderItemId()] = $addons;
+                $addonIds = array_merge($addonIds, $addons);
+            }
+        }
+        ?>
+        <?php foreach ($_items as $_item) : ?>
+        <?php /** @var \Magento\Sales\Model\Order\Invoice\Item $_item */?>
+            <?php if (!$_item->getOrderItem()->getParentItem()) : ?>
+                <?php if ($_item->getOrderItem()->getProductType() == 'bundle'):?>
+                    <tbody>
+                    <?php $bundleItemId = $_item->getOrderItemId(); $find = false; ?>
+                    <?php foreach ($_items as $bundleChild): ?>
+                        <?php /** @var \Magento\Sales\Model\Order\Invoice\Item $bundleChild */?>
+                        <?php if ($bundleChild->getOrderItem()->getParentItem()) : ?>
+                            <?php if ($bundleChild->getOrderItem()->getParentItemId() == $bundleItemId): ?>
+                                <?php if ($viewModel->isReportServiceProduct($bundleChild->getProductId()) && !$find) : ?>
+                                    <?php $find = true; ?>
+                                <?php endif; ?>
+                                <?= $block->getItemHtml($bundleChild); ?>
+                            <?php endif; ?>
+                        <?php endif;?>
+                    <?php endforeach; ?>
+                    <?php if ($_item->getOrderItem()->getIsRepotNotRequire()) : $fakeRepot = $viewModel->getFakeRepot(); ?>
+                        <?php if ($fakeRepot): ?>
+                            <?= $block->getItemHtml($viewModel->getFakeRepot()); ?>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                    <?php $addonList = $addonsByBundle[$bundleItemId] ?? []; ?>
+                    <?php if (!empty($addonList)): ?>
+                        <?php foreach ($_items as $item): ?>
+                            <?php if(in_array($item->getProductId(), $addonList)): ?>
+                                <?php if (empty($flag[$item->getProductId()]) || (!$flag[$item->getProductId()])): ?>
+                                    <?= $block->getItemHtml($item); ?>
+                                    <?php $flag[$item->getProductId()] = true;?>
+                                <?php endif;?>
+                            <?php endif;  ?>
+                        <?php endforeach; ?>
+                    <?php endif;  ?>
+                    </tbody>
+                <?php else: ?>
+                    <?php if (!in_array($_item->getProductId(),$addonIds)): ?>
+                        <tbody>
+                        <?= $block->getItemHtml($_item) ?>
+                        </tbody>
+                    <?php endif; ?>
+                <?php endif; ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
+        <tfoot class="order-totals">
+        <?= $block->getChildHtml('invoice_totals') ?>
+        </tfoot>
+    </table>
+<?php endif; ?>

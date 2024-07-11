@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="css/blog-layout.css"/>
+        <css src="css/placeholder.css"/>
+        <css src="css/add-on.css"/>
+        <css src="css/homepage.css"/>
+        <css src="css/cny.css"/>
+        <css src="css/add-to-cart-animation.css"/>
+        <css src="css/bundle.css"/>
+        <css src="css/flower-falling-effect.css"/>
+        <css src="css/w3.css"/>
+    </head>
+    <body>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template" name="theme.script.footer" as="theme-script-footer" template="Magento_Theme::script_footer.phtml" after="-" />
+            <block class="Magento\Framework\View\Element\Template" name="flower.falling.effect" template="Magento_Theme::flower_effect.phtml" after="-" ifconfig="mpanel/config_animation_effect/enable"/>
+        </referenceContainer>
+        <referenceBlock name="catalog.compare.link" remove="true" />
+        <referenceBlock name="catalog.compare.sidebar" remove="true" />
+        <referenceBlock name="wishlist_sidebar" remove="true" />
+        <referenceBlock name="register-link" remove="true" />
+    </body>
+</page>

@@ -1,0 +1,42 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!-- ko if: isDisplayed() -->
+<tr class="order totals">
+    <td data-block="dropdownTotal" colspan="2">
+        <div class="incl">
+            <div class="mark" scope="row">
+                <strong data-trigger=triggerTotal data-bind="i18n: title"></strong>
+            </div>
+            <div data-bind="attr: {'data-th':  $t(title)}" class="amount">
+                <strong><span class="price" data-bind="text: getValue()"></span></strong>
+                <!-- ko foreach: elems() -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+        <div class="excl">
+            <div class="tax">
+                <div class="mark" scope="row">
+                    <strong data-bind="i18n: 'GST (7%)'"></strong>
+                </div>
+                <div data-bind="attr: {'data-th': $t('GST (7%))'}" class="amount">
+                    <strong><span class="price" data-bind="text: getTaxMount()"></span></strong>
+                </div>
+            </div>
+            <div class="grand">
+                <div class="mark" scope="row">
+                    <strong data-bind="i18n: exclTaxLabel"></strong>
+                </div>
+                <div data-bind="attr: {'data-th': $t(exclTaxLabel)}" class="amount">
+                    <strong><span class="price" data-bind="text: getGrandTotalExclTax()"></span></strong>
+                </div>
+            </div>
+        </div>
+        <div data-bind="afterRender: loadDropdown"></div></td>
+    </td>
+</tr>
+<!-- /ko -->
