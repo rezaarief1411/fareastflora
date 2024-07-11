@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget id="bundlepotimage_bundlepotimage" class="Smartosc\Bundlepotimage\Block\Widget\Bundlepotimage" placeholder_image="Smartosc_Bundlepotimage::images/widget_bundlepotimage.png">
+        <label translate="true">Bundlepotimage</label>
+		<description translate="true">Contents of a Bundlepotimage</description>
+        <parameters>
+            <parameter name="bundlepotimage_id" xsi:type="block" visible="true" required="true" sort_order="0">
+                <label translate="true">Bundlepotimage</label>
+                <block class="Smartosc\Bundlepotimage\Block\Adminhtml\Widget\Chooser">
+                    <data>
+                        <item name="button" xsi:type="array">
+                            <item name="open" xsi:type="string" translate="true">Select Bundlepotimage...</item>
+                        </item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="template" xsi:type="select" visible="true" required="true" sort_order="10">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="Bundlepotimage.phtml" selected="true">
+                        <label translate="true">Bundlepotimage Default Template</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>

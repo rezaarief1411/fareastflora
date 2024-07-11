@@ -1,0 +1,28 @@
+<?php
+/** @var \Smartosc\CustomBundleProduct\Block\Product\Renderer\Listing\Bundle  $block */
+/** @var \Magento\Catalog\Model\Product $product */
+$product = $block->getProduct();
+$productId = $product->getId();
+$helper = $this->helper(\Magento\Catalog\Helper\Output::class);
+$options = $block->decorateArray($block->getOptions());
+?>
+<div class="bundle-opt-<?= $block->escapeHtmlAttr($productId) ?> bundle-option-right"
+     data-role="bundle-option-<?= $block->escapeHtmlAttr($productId) ?>">
+    <fieldset class="fieldset fieldset-bundle-options">
+        <?php foreach ($options as $option): ?>
+            <?php if (!$option->getSelections()): ?>
+                <?php continue; ?>
+            <?php endif; ?>
+            <?php echo $block->getProductOptionsHtml($option) ?>
+        <?php endforeach; ?>
+    </fieldset>
+</div>
+<script type="text/x-magento-init">
+    {
+        "[data-role=bundle-option-<?= $block->escapeJs($productId) ?>]": {
+            "Smartosc_CustomBundleProduct/js/option-renderer": {
+                 "jsonConfig": <?php /* @escapeNotVerified */ echo $block->getJsonConfig()?>
+            }
+        }
+    }
+</script>

@@ -1,0 +1,131 @@
+<?php
+#/app/code/Smartosc/Checkout/view/adminhtml/templates/order/shipping/view
+?>
+
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+//phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+?>
+<?php /** @var $block \Magento\Shipping\Block\Adminhtml\View */ ?>
+<?php $order = $block->getOrder() ?>
+<?php if ($order->getIsVirtual()):
+    return '';
+endif; ?>
+
+<?php /** @var \Smartosc\Checkout\Helper\Order\Data $helper */ ?>
+<?php
+$helper = $this->helper(\Smartosc\Checkout\Helper\Order\Data::class);
+$blockObj = $block->getLayout()->createBlock('Smartosc\Checkout\Block\Checkout\Main');
+$authorizeMessage = $blockObj->getAuthorizeMessage();
+?>
+<?php /* Shipping Method */ ?>
+<div class="admin__page-section-item order-shipping-method">
+    <div class="admin__page-section-item-title">
+        <span class="title"><?= $block->escapeHtml(__('Delivery &amp; Handling Information')) ?></span>
+    </div>
+
+    <?php if ($order->getShippingType() == 'delivery'): ?>
+        <!--Extra info delivery-->
+        <div class="admin__page-section-item-content extra">
+            <?php if ($deliveryDate = $order->getDeliveryDate()): $deliveryDate = $helper->getDate($deliveryDate); ?>
+                <?php if ($deliveryDate): ?>
+                    <strong><?= $block->escapeHtml('Delivery Date') ?></strong>
+                    <?= $helper->getDate($deliveryDate) ?>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+        <style>
+            .note.wrap-word{
+                resize: auto;
+                cursor: text;
+                white-space: pre-wrap;
+                overflow-wrap: break-word;
+                column-count: initial !important;
+            }
+        </style>
+        <div class="admin__page-section-item-content extra">
+            <?php if ($order->getDeliveryNote()): ?>
+                <strong><?= $block->escapeHtml('Delivery Note') ?></strong>
+                <div class="note wrap-word"><?= $order->getDeliveryNote() ?></div>
+            <?php endif; ?>
+        </div>
+
+    <?php  elseif ($order->getShippingType() == 'in_store_pickup'): ?>
+        <!--Extra info storepickup-->
+        <div class="admin__page-section-item-content extra">
+            <?php if ($pickupDate = $order->getPickupDate()): $pickupDate = $helper->getDate($pickupDate); ?>
+                <?php if ($pickupDate): ?>
+                    <strong><?= $block->escapeHtml('Store Pickup Date') ?></strong>
+                    <?= $helper->getDate($pickupDate) ?>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+        <div class="admin__page-section-item-content extra">
+            <?php if ($order->getPickupTime()): ?>
+                <strong><?= $block->escapeHtml('Store Pickup Time') ?></strong>
+                <?= $order->getPickupTime() ?>
+            <?php endif; ?>
+        </div>
+        <div class="admin__page-section-item-content extra">
+            <?php if ($order->getPickupComments()): ?>
+                <strong><?= $block->escapeHtml('Store Pickup Note') ?></strong>
+                <?= $order->getPickupComments() ?>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <!--Extra info getGiftMessageFrom-->
+    <div class="admin__page-section-item-content extra">
+        <?php if ($order->getGiftMessageFrom()): ?>
+            <strong><?= $block->escapeHtml('Gift Message From') ?></strong>
+            <?= $order->getGiftMessageFrom() ?>
+        <?php endif; ?>
+    </div>
+    <div class="admin__page-section-item-content extra">
+        <?php if ($order->getGiftMessageTo()): ?>
+            <strong><?= $block->escapeHtml('Gift Message To') ?></strong>
+            <?= $order->getGiftMessageTo() ?>
+        <?php endif; ?>
+    </div>
+    <div class="admin__page-section-item-content extra">
+        <?php if ($order->getGiftMessage()): ?>
+            <strong><?= $block->escapeHtml('Gift Message') ?></strong>
+            <?= $order->getGiftMessage() ?>
+        <?php endif; ?>
+    </div>
+
+    <!-- Authorize Message -->
+    <div class="admin__page-section-item-content extra">
+        <?php if ($order->getAcceptAuthorize()): ?>
+            <strong><?= $block->escapeHtml('Authorize Message') ?></strong>
+            <?= $authorizeMessage ?>
+        <?php endif; ?>
+    </div>
+
+    <div class="admin__page-section-item-content">
+        <?php  if ($order->getTracksCollection()->count()): ?>
+            <p><a href="#" id="linkId" onclick="popWin('<?= $block->escapeHtmlAttr($block->escapeJs($block->escapeUrl($this->helper(Magento\Shipping\Helper\Data::class)->getTrackingPopupUrlBySalesModel($order)))) ?>','trackorder','width=800,height=600,resizable=yes,scrollbars=yes')" title="<?= $block->escapeHtmlAttr(__('Track Order')) ?>"><?= $block->escapeHtml(__('Track Order')) ?></a></p>
+        <?php endif; ?>
+        <?php if ($order->getShippingDescription()): ?>
+            <strong><?= $block->escapeHtml($order->getShippingDescription()) ?></strong>
+
+            <?php if ($this->helper(Magento\Tax\Helper\Data::class)->displayShippingPriceIncludingTax()): ?>
+                <?php $_excl = $block->displayShippingPriceInclTax($order); ?>
+            <?php else: ?>
+                <?php $_excl = $block->displayPriceAttribute('shipping_amount', false, ' '); ?>
+            <?php endif; ?>
+            <?php $_incl = $block->displayShippingPriceInclTax($order); ?>
+
+            <?= /** @noEscape */ $_excl ?>
+            <?php if ($this->helper(Magento\Tax\Helper\Data::class)->displayShippingBothPrices()
+                && $_incl != $_excl): ?>
+                (<?= $block->escapeHtml(__('Incl. Tax')) ?> <?= /** @noEscape */ $_incl ?>)
+            <?php endif; ?>
+        <?php else: ?>
+            <?= $block->escapeHtml(__('No shipping information available')) ?>
+        <?php endif; ?>
+    </div>
+</div>

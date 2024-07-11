@@ -1,0 +1,81 @@
+<?php
+
+/** @var \Magento\Sales\Model\Order $_order */
+$_order = $block->getOrder();
+/** @var \Smartosc\CustomBundleProduct\Helper\CartItemHelper $addonHelper */
+$addonHelper = $this->helper(\Smartosc\CustomBundleProduct\Helper\CartItemHelper::class);
+/** @var \Smartosc\CustomBundleProduct\ViewModel\Adminhtml\OrderDetail $viewModel */
+$viewModel = $block->getViewModel()->setOrder($_order); ?>
+<div class="admin__table-wrapper">
+    <table class="data-table admin__table-primary edit-order-table">
+        <thead>
+        <tr class="headings">
+            <?php $i = 0;
+            $columns = $block->getColumns();
+            $lastItemNumber = count($columns) ?>
+            <?php foreach ($columns as $columnName => $columnTitle) : ?>
+                <?php $i++; ?>
+                <th class="col-<?= $block->escapeHtmlAttr($columnName) ?><?= /* @noEscape */ ($i === $lastItemNumber ? ' last' : '') ?>"><span><?= $block->escapeHtml($columnTitle) ?></span></th>
+            <?php endforeach; ?>
+        </tr>
+        </thead>
+        <?php $_items = $block->getItemsCollection()->getItems(); $productOptions = []; $addonList = []; $i = 0; ?>
+        <?php foreach ($_items as $_item): ?>
+            <?php if ($_item->getParentItem()) : ?>
+                <?php $parent = $_item->getParentItem(); ?>
+                <?php if ($parent->getProductType() === 'bundle'): ?>
+                    <?php $productOptions[$_item->getParentItem()->getItemId()][] = $_item; ?>
+                <?php endif; ?>
+            <?php else: ?>
+                <?php if ($_item->getProductType() === 'bundle') : ?>
+                    <?php $addonByBundle = $addonHelper->getAddonItemIds($_item); // list addon by bundle?>
+                    <?php $addonList[$_item->getItemId()] = []; ?>
+                    <?php foreach ($addonByBundle as $addonByBundleItem): ?>
+                        <?php foreach ($_items as $addonItem) : ?>
+                            <?php if ($addonItem->getQuoteItemId() == $addonByBundleItem) :?>
+                                <?php $addonList[$_item->getItemId()][] = $addonItem; ?>
+                            <?php endif;?>
+                        <?php endforeach;?>
+                    <?php endforeach;?>
+                <?php endif; ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
+        <?php $i = 0; foreach ($_items as $_item) : ?>
+            <?php
+            if ($_item->getParentItem()) :
+                continue;
+            else :
+                $i++;
+            endif;
+            ?>
+            <?php if ($_item->getProductType() !== 'bundle') : ?>
+                <tbody class="<?= /* @noEscape */ $i%2 ? 'even' : 'odd' ?>">
+                <?= $block->getItemHtml($_item) ?>
+                <?= $block->getItemExtraInfoHtml($_item) ?>
+                </tbody>
+            <?php else : ?>
+                <?php /** @var \Magento\Sales\Model\Order\Item $_item */ ?>
+                <?php if ($_item->getProductType() === 'bundle') : ?>
+                    <?php $children = $productOptions[$_item->getItemId()];
+                    $find = false; ?>
+                    <?php foreach ($children as $child) : ?>
+                        <?= $block->getItemHtml($child) ?>
+                        <?= $block->getItemExtraInfoHtml($child) ?>
+                    <?php endforeach; ?>
+                    <?php if ($_item->getIsRepotNotRequire()) : ?>
+                        <?php $viewModel->setParentItemId($_item->getItemId()); ?>
+                        <?php $orderItem = $viewModel->getOrderItem(); ?>
+                        <?php if ($orderItem): ?>
+                            <?= $block->getItemHtml($orderItem) ?>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                    <?php if (!empty($addonList[$_item->getItemId()])) : ?>
+                        <?php foreach ($addonList[$_item->getItemId()] as $orderItemAddon) : ?>
+                            <!-- <?= $block->getItemHtml($orderItemAddon); ?> -->
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                <?php endif; ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </table>
+</div>

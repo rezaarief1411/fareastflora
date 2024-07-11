@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Smartosc\Bundlepotimage\Model\Bundlepotimage">
+        <arguments>
+            <argument name="resource" xsi:type="object">Smartosc\Bundlepotimage\Model\ResourceModel\Bundlepotimage</argument>
+        </arguments>
+    </type>
+</config>

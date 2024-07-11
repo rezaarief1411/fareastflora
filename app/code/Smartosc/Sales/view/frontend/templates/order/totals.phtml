@@ -1,0 +1,78 @@
+<?php
+
+/**
+ * Exclusive template "totals" used for email render
+ *
+ * @var $block \Magento\Sales\Block\Order\Totals
+ * @see \Magento\Sales\Block\Order\Totals
+ */
+$order = $block->getOrder();
+/** @var \Smartosc\Sales\ViewModel\Totals $viewModel */
+$viewModel = $block->getViewModel()->setOrder($order);
+$totalsArray = $block->getTotals();
+$results = [];
+$tax = null;
+$grand = null;
+foreach ($totalsArray as $key => $value) {
+    if ($key == 'tax' || $key == 'grand_total_excl') {
+        if ($key == 'tax') {
+            $tax = $value;
+            continue;
+        }
+        if ($key == 'grand_total_excl') {
+            if(!empty($tax)) {
+                $results['tax'] = $tax;
+                $grand = $value;
+            }
+        }
+    }
+    $results[$key] = $value;
+
+}
+
+?>
+<?php foreach ($results as $_code => $_total) : ?>
+    <?php if ($_total->getBlockName()) : ?>
+        <?= $block->getChildHtml($_total->getBlockName(), false) ?>
+    <?php else :?>
+        <tr class="<?= $block->escapeHtmlAttr($_code) ?>">
+            <th <?= /* @noEscape */ $block->getLabelProperties() ?> scope="row">
+                <?php if ($_total->getStrong()) : ?>
+                    <strong><?= $block->escapeHtml($_total->getLabel()) ?>:</strong>
+                <?php else : ?>
+                    <?= $block->escapeHtml($_total->getLabel()) ?>:
+                <?php endif ?>
+            </th>
+            <td <?= /* @noEscape */ $block->getValueProperties() ?> data-th="<?= $block->escapeHtmlAttr($_total->getLabel()) ?>">
+                <?php if ($_total->getStrong()) : ?>
+                    <strong><?= /* @noEscape */ $block->formatValue($_total) ?></strong>
+                <?php else : ?>
+
+                    <?php if ($_total->getCode() == 'grand_total'): ?>
+                        <div class="totals saving order"><span class="price" ><?= $viewModel->getTotalSaving() ?></span></div>
+                    <? endif; ?>
+                    <?= /* @noEscape */ $block->formatValue($_total) ?>
+                <?php endif?>
+            </td>
+        </tr>
+    <?php endif; ?>
+<?php endforeach?>
+
+<script>
+    require([
+        "jquery",
+    ], function ($) {
+        var $tax_amount = $('.tax_amount');
+        var $grand_total_excl = $('.grand_total_excl');
+        $(document).ready(function() {
+            $tax_amount.hide();
+            $grand_total_excl.hide();
+
+            $('tr.grand_total').on('click', function (event) {
+                $(this).find('.amount').toggleClass('active');
+                $tax_amount.toggle();
+                $grand_total_excl.toggle();
+            })
+        });
+    });
+</script>

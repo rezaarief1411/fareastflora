@@ -1,0 +1,126 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+
+<?php /* @var $block \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option\Checkbox */ ?>
+<?php $_option = $block->getOption() ?>
+<?php $_selections = $_option->getSelections() ?>
+<div class="field option repot <?= ($_option->getRequired()) ? ' required': '' ?>">
+    <div class="control">
+        <div class="nested options-list">
+            <?php if ($block->showSingle()) : ?>
+                <?= /* @noEscape */ $block->getSelectionQtyTitlePrice($_selections[0]) ?>
+
+                <input type="hidden"
+                       class="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>  product bundle option"
+                       name="bundle_option[<?= $block->escapeHtml($_option->getId()) ?>]"
+                       value="<?= $block->escapeHtmlAttr($_selections[0]->getSelectionId()) ?>"/>
+                <input class="hidden-input" name="repotting_service" value="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>][<?= $block->escapeHtmlAttr($_selections[0]->getId()) ?>]"/>
+            <?php else :?>
+                <?php foreach ($_selections as $_selection) : ?>
+                    <div class="field choice">
+                        <?php
+                        $blockName = $block->getNameInLayout();
+                        $blockName = str_replace("\\", "_", $blockName);
+                        ?>
+                        <input class="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?> checkbox product bundle option change-container-classname checkbox-price"
+                               id="bundle-option-<?=$blockName?>-<?= $block->escapeHtmlAttr($_option->getId()) ?>-<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>"
+                               type="checkbox"
+                            <?php if ($_option->getRequired()) { echo 'data-validate="{\'validate-one-required-by-name\':\'input[name^=&quot;bundle_option[' . $block->escapeHtmlAttr($_option->getId()) . ']&quot;]:checked\'}"'; } ?>
+                               name="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>][<?= $block->escapeHtmlAttr($_selection->getId()) ?>]-<?=$blockName?>"
+                               data-selector="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>][<?= $block->escapeHtmlAttr($_selection->getId()) ?>]"
+                            <?php if ($block->isSelected($_selection)) { echo ' checked="checked"'; } ?>
+                            <?php if (!$_selection->isSaleable()) { echo ' disabled="disabled"'; } ?>
+                               value="<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>"/>
+                        <label class="label"
+                               for="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>-<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>">
+                            <span class="repot-label"></span>
+                            <span><?= /* @noEscape */ $block->getSelectionQtyTitlePrice($_selection) ?></span>
+
+
+                            <span class="repot-fee"></span>
+                        </label>
+                        <input type="button" class="repot-service active" id="repot-no-<?=$blockName?>" name="repot-<?=$blockName?>" value="No" data-click="true">
+                        <input type="button" class="repot-service" id="repot-yes-<?=$blockName?>" name="repot-<?=$blockName?>" value="Yes" data-click="false">
+                        <input class="hidden-input" name="repotting_service" value="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>][<?= $block->escapeHtmlAttr($_selection->getId()) ?>]"/>
+                    </div>
+                    <script type="text/javascript">
+                        require([
+                            'jquery',
+                            'domReady!'
+                        ], function ($) {
+                            var context = '.bundle-opt-' + <?php echo $block->getProduct()->getId();?>;
+                            $('#repot-no-<?=$blockName?>', context).click(function() {
+                                $(this).siblings('.repot-service').removeClass("active");
+                                $(this).addClass("active");
+                                $(this).closest('.field.choice').find(".checkbox-price").prop('checked', false);
+                                let productPrice = $(this).closest('.product-top').find('.price-wrapper:first').attr('data-price-amount');
+                                let originalPrice = getOriginalPrice($(this).closest('.fieldset-bundle-options').children('div:eq(1)').find('.field.choice'), productPrice);
+                                if ($(this).attr('data-click') != true){
+                                    let potPrice = $(this).closest('.product-top').find('.price-wrapper:first').attr('data-pot-price');
+                                    if (potPrice == undefined) {
+                                        $(this).closest('.product-top').find('.price:first').text('$' + (parseFloat(originalPrice).toFixed(2)));
+                                    } else {
+                                        $(this).closest('.product-top').find('.price:first').text('$' + (parseFloat(potPrice).toFixed(2)));
+                                    }
+                                    if ($(this).closest('.product-top').find('.old-price').length > 0) {
+                                        let productPrice_old = $(this).closest('.product-top').find('.old-price .price-wrapper').attr('data-price-amount');
+                                        let originPrice_old = getOriginalPrice($(this).closest('.fieldset-bundle-options').children('div:eq(1)').find('.field.choice'), productPrice_old);
+                                        if (potPrice == undefined) {
+                                            $(this).closest('.product-top').find('.old-price .price').text('$' + parseFloat(originPrice_old).toFixed(2));
+                                        } else {
+                                            $(this).closest('.product-top').find('.old-price .price').text('$' + (parseFloat(originPrice_old) - parseFloat(originalPrice) + parseFloat(potPrice)).toFixed(2));
+                                        }
+                                    }
+                                    $(this).closest('.product-top').find('.price-wrapper:first').attr('data-repot-price', 0);
+                                    $(this).attr('data-click', 'true');
+                                    $(this).siblings('.repot-service').attr('data-click', 'false');
+                                }
+                            });
+                            $('#repot-yes-<?=$blockName?>', context).click(function() {
+                                $(this).siblings('.repot-service').removeClass("active");
+                                $(this).addClass("active");
+                                $(this).closest('.field.choice').find(".checkbox-price").prop('checked', true);
+                                let productPrice = $(this).closest('.product-top').find('.price-wrapper:first').attr('data-price-amount');
+                                let originalPrice = getOriginalPrice($(this).closest('.fieldset-bundle-options').children('div:eq(1)').find('.field.choice'), productPrice);
+                                if ($(this).attr('data-click') != true){
+                                    let potPrice = $(this).closest('.product-top').find('.price-wrapper:first').attr('data-pot-price');
+                                    let repotPrice = $(this).siblings('.label').find('.price-wrapper').attr('data-price-amount');
+                                    if (potPrice == undefined) {
+                                        $(this).closest('.product-top').find('.price:first').text('$' + (parseFloat(originalPrice) + parseFloat(repotPrice)).toFixed(2));
+                                    } else {
+                                        $(this).closest('.product-top').find('.price:first').text('$' + (parseFloat(potPrice) + parseFloat(repotPrice)).toFixed(2));
+                                    }
+                                    if ($(this).closest('.product-top').find('.old-price').length > 0) {
+                                        let productPrice_old = $(this).closest('.product-top').find('.old-price .price-wrapper').attr('data-price-amount');
+                                        let originPrice_old = getOriginalPrice($(this).closest('.fieldset-bundle-options').children('div:eq(1)').find('.field.choice'), productPrice_old);
+                                        if (potPrice == undefined) {
+                                            $(this).closest('.product-top').find('.old-price .price').text('$' + (parseFloat(originPrice_old) + parseFloat(repotPrice)).toFixed(2));
+                                        } else {
+                                            $(this).closest('.product-top').find('.old-price .price').text('$' + (parseFloat(originPrice_old) - parseFloat(originalPrice) + parseFloat(potPrice) + parseFloat(repotPrice)).toFixed(2));
+                                        }
+                                    }
+                                    $(this).closest('.product-top').find('.price-wrapper:first').attr('data-repot-price', parseFloat(repotPrice).toFixed(2));
+                                    $(this).attr('data-click', 'true');
+                                    $(this).siblings('.repot-service').attr('data-click', 'false');
+                                }
+                            });
+                            function getOriginalPrice(element, productPrice) {
+                                let OptPrice = []
+                                $(element).each(function () {
+                                    OptPrice.push($(this).find('.price-wrapper').attr('data-price-amount'));
+                                });
+                                return (productPrice - Math.min.apply(Math,OptPrice));
+                            }
+                        });
+                    </script>
+
+                <?php endforeach; ?>
+                <div id="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>-container"></div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>

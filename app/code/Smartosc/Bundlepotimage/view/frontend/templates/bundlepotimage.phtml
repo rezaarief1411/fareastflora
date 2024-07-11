@@ -1,0 +1,23 @@
+<?php $bundlepotimageId = $this->getBundlepotimageId() ?>
+<?php $bundlepotimage = $this->getBundlepotimageById($bundlepotimageId) ?>
+<?php if($bundlepotimage): ?>
+	<div class="bundlepotimage<?php echo $this->getCustomClass($bundlepotimage) ?>">
+		<a<?php if($bundlepotimage->getUrl()!=''): ?> href="<?php echo $bundlepotimage->getUrl() ?>"<?php endif ?>>
+			<img alt="" src="<?php echo $this->getBundlepotImageUrl($bundlepotimage) ?>" class="img-responsive" />
+		</a>
+		<?php if(($bundlepotimage->getContent() != '') || ($bundlepotimage->getButton() != '')): ?>
+			<div class="text<?php if($bundlepotimage->getTextAlign()!=''): ?> <?php echo $bundlepotimage->getTextAlign() ?><?php endif ?>">
+				<?php if($bundlepotimage->getContent() != ''): ?>
+					<div class="bundlepotimage-text"><?php echo $bundlepotimage->getContent() ?></div>
+				<?php endif ?>
+				<?php if($bundlepotimage->getButton() != ''): ?>
+					<span class="bundlepotimage-button">
+						<button class="btn btn-default btn-bundlepotimage"><?php echo $bundlepotimage->getButton() ?></button>
+					</span>
+				<?php endif ?>
+			</div>
+		<?php endif ?>
+	</div>
+<?php else: ?>
+	<div role="alert" class="alert alert-warning"> <?php echo __('We can\'t find bundlepotimages matching the selection.') ?> </div>
+<?php endif ?>

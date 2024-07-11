@@ -1,0 +1,11 @@
+<?php $_item = $block->getItem() ?>
+<?php if ($_item) : ?>
+    <tr class="bundle-item bundle-parent">
+        <td class="item-info">
+            <p class="product-name"><?= $block->escapeHtml($_item->getName()) ?></p>
+            <p class="sku"><?= $block->escapeHtml(__('SKU')) ?>: <?= $block->escapeHtml($_item->getSku()) ?></p>
+        </td>
+        <td class="item-qty"></td>
+        <td class="item-price" colspan="3" style="text-align: center;"><?= __("Not require"); ?></td>
+    </tr>
+<?php endif; ?>

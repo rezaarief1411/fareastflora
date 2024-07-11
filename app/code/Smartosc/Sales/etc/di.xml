@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Sales\Model\Order\Email\Sender\ShipmentSender" type="Smartosc\Sales\Model\Order\Email\Sender\ShipmentSender"/>
+    <preference for="Magento\Sales\Model\Order\Email\Sender\InvoiceSender" type="Smartosc\Sales\Model\Order\Email\Sender\InvoiceSender"/>
+    <preference for="Magento\Sales\Model\Order\Email\Sender\OrderSender" type="Smartosc\Sales\Model\Order\Email\Sender\OrderSender"/>
+    <preference for="Magento\Sales\Controller\Adminhtml\Order\Invoice\Save" type="Smartosc\Sales\Controller\Adminhtml\Order\Invoice\Save" />
+    <preference for="Magento\Framework\Mail\Template\TransportBuilder" type="Smartosc\Sales\Model\Mail\TransportBuilder"/>
+    <preference for="Magento\Sales\Model\Order\Email\SenderBuilder" type="Smartosc\Sales\Model\Mail\SenderBuilder"/>
+    <preference for="Magento\Sales\Model\Order\Email\Container\Template" type="Smartosc\Sales\Model\Mail\Container\Template"/>
+    <preference for="Magento\Sales\Controller\Adminhtml\Order\Invoice\Save" type="Smartosc\Sales\Controller\Adminhtml\Order\Invoice\Save" />
+
+    <type name="Smartosc\Sales\Model\Order\Email\Sender\OrderSender">
+        <arguments>
+            <argument name="identityContainer" xsi:type="object" shared="false">Magento\Sales\Model\Order\Email\Container\OrderIdentity</argument>
+        </arguments>
+    </type>
+    <type name="Smartosc\Sales\Model\Order\Email\Sender\ShipmentSender">
+        <arguments>
+            <argument name="identityContainer" xsi:type="object" shared="false">Magento\Sales\Model\Order\Email\Container\ShipmentIdentity</argument>
+        </arguments>
+    </type>
+    <type name="Smartosc\Sales\Model\Order\Email\Sender\InvoiceSender">
+        <arguments>
+            <argument name="identityContainer" xsi:type="object" shared="false">Magento\Sales\Model\Order\Email\Container\InvoiceIdentity</argument>
+        </arguments>
+    </type>
+</config>

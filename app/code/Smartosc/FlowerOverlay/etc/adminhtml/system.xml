@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="flower_overlay" translate="label" type="text" sortOrder="1009" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Flower Overlay</label>
+            <tab>smartosc_mpanel</tab>
+            <resource>Smartosc_Mpanel::system_config</resource>
+            <group id="image_upload" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="image_left" translate="label" type="image" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Left Image</label>
+                    <backend_model>Smartosc\FlowerOverlay\Model\Config\Backend\Image</backend_model>
+                    <base_url type="media" scope_info="1">flower/overlay</base_url>
+                    <comment><![CDATA[Allowed file types: jpg, jpeg, gif, png, svg]]></comment>
+                </field>
+                <field id="image_right" translate="label" type="image" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Right Image</label>
+                    <backend_model>Smartosc\FlowerOverlay\Model\Config\Backend\Image</backend_model>
+                    <base_url type="media" scope_info="1">flower/overlay</base_url>
+                    <comment><![CDATA[Allowed file types: jpg, jpeg, gif, png, svg]]></comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

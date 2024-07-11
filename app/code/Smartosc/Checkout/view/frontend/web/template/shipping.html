@@ -1,0 +1,108 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<li id="shipping" class="checkout-shipping-address" data-bind="fadeVisible: visible()">
+
+    <div data-role="title" class="checkout-shipping-type">
+        <div data-bind="click: actionPickupTab(), attr: { class: currentProfit() < 0 ? 'title active' : 'title' }">
+            <button type="button" class="btn btn-primary"><span>In Store Pickup</span></button>
+        </div>
+        <div data-bind="click: actionDeliveyTab(), attr: { class: currentProfit() > 0 ? 'title active' : 'title' }">
+            <button type="button" class="btn btn-primary"><span>Delivery</span></button>
+        </div>
+    </div>
+    <div data-role="content">
+        <div class="step-content">
+            <!-- Start pickup -->
+             <div class="store-container" data-bind="fadeVisible: pickupTab">
+                 <form class="delivery-extra-information" id="store-delivery-address-form" submit="setShippingInformationStorePickup" novalidate="novalidate">
+                    <div class="step-title" data-role="title" data-bind="i18n: 'In Store Pickup Info'"></div>
+                     <div class="step-content" data-role="content">
+                         <!-- ko foreach: getRegion('delivery-extra-information') -->
+                         <!-- ko template: getTemplate() --><!-- /ko -->
+                         <!--/ko-->
+                         <div class="gift-card-container">
+                             <each args="data: getRegion('smart-gift'), as: 'element'">
+                                 <render if="hasTemplate()"/>
+                             </each>
+
+                         </div>
+                         <div class="billing-address-container">
+                             <div class="step-title" translate="'Billing Info'" data-role="title" />
+                             <div id="delivery-billing-address-form" class="form-billing-address form address-billing">
+                                 <each args="getRegion('billing-address')" render=""/>
+                             </div>
+                         </div>
+                     </div>
+                     <!-- Button Next -->
+                     <div class="actions-toolbar" id="pickup-method-buttons-container">
+                         <div class="primary">
+                             <button data-role="opc-continue" type="submit" class="button action continue primary">
+                                 <span translate="'Next'" />
+                             </button>
+                         </div>
+                     </div>
+                 </form>
+            </div>
+            <!-- End pickup -->
+
+            <!-- Start delivery -->
+            <div class="shipping-address-container" data-bind="fadeVisible: deliveryTab">
+                <form id="co-delivery-address-form" submit="setShippingInformation" novalidate="novalidate">
+
+                    <div class="billing-address-container">
+                        <div class="step-title" translate="'Billing Info'" data-role="title"/>
+                        <div id="co-billing-address-form" class="form-billing-address form address-billing">
+                            <each args="getRegion('billing-address')" render=""/>
+                            <input type="hidden" class="auto-select-country" data-bind="afterRender: autoSelectBillingCountry"/>
+                        </div>
+                    </div>
+                    <div class="gift-card-container">
+                        <each args="data: getRegion('smart-gift'), as: 'element'">
+                            <render if="hasTemplate()"/>
+                        </each>
+                    </div>
+                    <div class="shipping-address-same-as-billing-block field choice">
+                        <input type="radio" name="shipping-address-same-as-billing"
+                               data-bind="checked: isShippingAddresstTheSameBillingAddress, attr: {id: 'shipping-address-same-as-billing' }"
+                               value='true'/>
+                        <label data-bind="attr: {for: 'shipping-address-same-as-billing'}"><span
+                                data-bind="i18n: 'Delivery to the same address'"></span></label>
+                    </div>
+                    <div class="shipping-address-diff-billing-block field choice">
+                        <input type="radio" name="shipping-address-same-as-billing"
+                               data-bind="checked: isShippingAddresstTheSameBillingAddress, attr: {id: 'shipping-address-different-billing'}"
+                               value='false'/>
+                        <label data-bind="attr: {for: 'shipping-address-different-billing'}"><span
+                                data-bind="i18n: 'Delivery to the different address'"></span></label>
+                    </div>
+                    <div id="co-shipping-address-form" class="form address-shipping"
+                         data-bind="fadeVisible: isShippingAddresstTheSameBillingAddress() == 'false'">
+                        <div class="step-title" translate="'Shipping Address'" data-role="title"/>
+                        <div id="checkout-step-shipping"
+                             class="step-content"
+                             data-role="content">
+                            <each args="getRegion('before-form')" render=""/>
+
+                            <!-- Inline address form -->
+                            <render  args="shippingFormTemplate"/>
+                        </div>
+                    </div>
+                    <!-- Button Next -->
+                    <div class="actions-toolbar" id="delivery-method-buttons-container">
+                        <div class="primary">
+                            <button data-role="opc-continue" type="submit" class="button action continue primary">
+                                <span translate="'Next'" />
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- End delivery -->
+        </div>
+    </div>
+    <div data-bind="afterRender: afterRenderContent"></div>
+</li>

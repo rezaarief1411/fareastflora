@@ -1,0 +1,98 @@
+<?php
+/* @var \Smartosc\Blog\Block\Html\Sorter $block */
+?>
+<div class="posts-category">
+    <section class="category-tool">
+        <?php if (count($block->getAvailableCategory()) == 0): ?>
+            <?php foreach ($block->getAllCategory() as $_idx => $_category) : ?>
+                <?php $parseCategory = $block->parseCategory($_category); ?>
+                <button data-mage-init='{"redirectUrl": {"url":"<?= $block->getCategoryUrl($parseCategory['url_key']) ?>#blog-category"}}' class="cat-<?= $parseCategory['id']; ?>
+                <?php
+                if ($block->getUrlCategory()) {
+                    if ($block->getUrlCategory() == $parseCategory['url_key']) {
+                        echo '_active"';
+                    }
+                } else {
+                    if ($parseCategory['url_key'] == "all") {
+                        echo '_active';
+                    }
+                }
+                ?>">
+                    <?= $parseCategory['title'] ?> </button>
+            <?php endforeach; ?>
+        <?php endif ?>
+        <?php foreach ($block->getAvailableCategory() as $_idx => $_category) : ?>
+            <?php $parseCategory = $block->parseCategory($_category); ?>
+            <button data-mage-init='{"redirectUrl": {"url":"<?= $block->getCategoryUrl($parseCategory['url_key']) ?>#blog-category"}}' class="cat-<?= $parseCategory['id']; ?>
+            <?php
+            if ($block->getUrlCategory()) {
+                if ($block->getUrlCategory() == $parseCategory['url_key']) {
+                    echo '_active"';
+                }
+            } else {
+                if ($parseCategory['url_key'] == "all") {
+                    echo '_active';
+                }
+            }
+            ?>">
+                <?= $parseCategory['title'] ?> </button>
+        <?php endforeach; ?>
+	    <button class="clear-filter" data-mage-init='{"redirectUrl": {"url":"<?= $block->getBaseUrl(); ?>blog"}}'><?php echo __("Clear Search") ?></button>
+    </section>
+    <select class="category-tool-mobile" data-mage-init='{"redirectUrl": {"event":"change"}}'>
+        <?php foreach ($block->getAvailableCategory() as $_idx => $_category) : ?>
+            <?php $parseCategory = $block->parseCategory($_category); ?>
+            <option value="<?php echo $block->getCategoryUrl($parseCategory['url_key'])."#blog-category" ?>"
+            <?php
+                if ($block->getUrlCategory()) {
+                    if ($block->getUrlCategory() == $parseCategory['url_key']) {
+                        echo 'selected';
+                    }
+                } else {
+                    if ($parseCategory['url_key'] == "all") {
+                        echo 'selected';
+                    }
+                }
+                ?>>
+                <?php echo $parseCategory['title'] ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
+<div class="posts-filter-amount">
+    <div class="posts-filter">
+        <div class="form-group">
+            <label for="sortby"><?php /* @escapeNotVerified */ echo __('Sort By'); ?></label>
+            <select class="form-control" id="sortby" data-mage-init='{"redirectUrl": {"event":"change"}}'>
+                <option value="" selected disabled><?php /* @escapeNotVerified */ echo __('Please select'); ?></option>
+                <?php foreach ($block->getAvailableSortBy() as $_key => $_sort) : ?>
+
+                    <option value="<?php /* @escapeNotVerified */ echo $block->getSortByUrl($_key) ?>" <?php if ($block->isSortByCurrent($_key)) : ?> selected="selected" <?php endif ?>>
+                        <?php /* @escapeNotVerified */ echo $_sort; ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="page_size"><?php /* @escapeNotVerified */ echo __('Show'); ?></label>
+            <select class="form-control" id="page_size" data-mage-init='{"redirectUrl": {"event":"change"}}'>
+                <option value="" selected disabled><?php /* @escapeNotVerified */ echo __('Please select'); ?></option>
+                <?php foreach ($block->getAvailableLimit() as $_key => $_limit) : ?>
+                    <option value="<?php /* @escapeNotVerified */ echo $block->getLimitUrl($_key) ?>" <?php if ($block->isLimitCurrent($_key)) : ?> selected="selected" <?php endif ?>>
+                        <?php /* @escapeNotVerified */ echo $_limit ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+
+    <p class="toolbar-amount h5">
+        <span class="toolbar-number">
+            <?php if ($block->getTotalNum() > 1) : ?>
+                <?php /* @escapeNotVerified */ echo __('%1 Posts in this category', $block->getTotalNum()); ?>
+            <?php else : ?>
+                <?php /* @escapeNotVerified */ echo __('%1 Post in this category', $block->getTotalNum()); ?>
+            <?php endif; ?>
+        </span>
+    </p>
+</div>

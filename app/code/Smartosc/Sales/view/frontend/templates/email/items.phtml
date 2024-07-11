@@ -1,0 +1,113 @@
+<?php
+use Magento\Framework\App\ObjectManager;
+use Smartosc\CustomBundleProduct\Block\Order\Email\Items\Order\PseudoItem;
+/** @var \Magento\Framework\View\Element\AbstractBlock $block */
+$_order = $block->getOrder();
+$blockTotals = $block->getChildBlock('order_totals')->setOrder($_order);
+/** @var \Smartosc\CustomBundleProduct\Helper\CartItemHelper $addonHelper */
+$addonHelper = $this->helper(\Smartosc\CustomBundleProduct\Helper\CartItemHelper::class);
+/** @var \Smartosc\CustomBundleProduct\Model\BundleProduct\ReportService $repotService */
+$repotService = ObjectManager::getInstance()->get(\Smartosc\CustomBundleProduct\Model\BundleProduct\ReportService::class)
+?>
+<?php if ($_order) : ?>
+    <?php $_items = $_order->getAllItems(); ?>
+    <table class="email-items" style="width: 100%; margin: 0;">
+        <thead>
+        <tr>
+            <th class="item-info" width="50%">
+                <?= $block->escapeHtml(__('Product Name')) ?>
+            </th>
+            <th class="item-sku" width="20%">
+                <?= $block->escapeHtml(__('Item Code')) ?>
+            </th>
+            <th class="item-price" width="10%">
+                <?= $block->escapeHtml(__('Unit Price')) ?>
+            </th>
+            <th class="item-qty" width="10%">
+                <?= $block->escapeHtml(__('Qty')) ?>
+            </th>
+            <th class="item-subtotal" width="10%">
+                <?= $block->escapeHtml(__('Subtotal')) ?>
+            </th>
+        </tr>
+        </thead>
+        <?php $flag = [];
+        $addonIds = [];
+        $addonsByBundle = [];
+         foreach ($_items as $_item){
+            if ($_item->getProductType() == 'bundle') {
+                $addons = $addonHelper->getAddonList($_item);
+                $addonsByBundle[$_item->getItemId()] = $addons;
+                $addonIds = array_merge($addonIds, $addons);
+            }
+         }
+        ?>
+        <?php foreach ($_items as $_item) : ?>
+            <?php /** @var \Magento\Sales\Model\Order\Item $_item */?>
+            <?php if (!$_item->getParentItem()) : ?>
+                <?php if ($_item->getProductType() == 'bundle'):?>
+                    <tbody>
+                    <?php $bundleItemId = $_item->getItemId(); ?>
+                    <?php $numItems = count($_items); $i = 0;?>
+                    <?php foreach ($_items as $bundleChild): ?>
+                        <?php /** @var \Magento\Sales\Model\Order\Item  $bundleChild */?>
+                        <?php if ($bundleChild->getParentItem()) : ?>
+                            <?php if ($bundleChild->getParentItemId() == $bundleItemId): ?>
+                                    <?= $block->getItemHtml($bundleChild); ?>
+                            <?php endif; ?>
+                        <?php endif;?>
+                    <?php endforeach; ?>
+                    <?php if ($_item->getIsRepotNotRequire()) : ?>
+                        <?php
+                        /** @var PseudoItem $pseudoItem */
+                        $pseudoItem = $block->getLayout()->createBlock(PseudoItem::class);
+                        echo $pseudoItem->toHtml(); ?>
+                    <?php endif; ?>
+                    <?php $addonList = $addonsByBundle[$bundleItemId] ?? []; ?>
+                    <?php if (!empty($addonList)): ?>
+                        <?php foreach ($_items as $item): ?>
+                            <?php if(in_array($item->getProductId(), $addonList)): ?>
+                                <?php if (empty($flag[$item->getProductId()]) || (!$flag[$item->getProductId()])): ?>
+                                <?= $block->getItemHtml($item); ?>
+                                    <?php $flag[$item->getProductId()] = true;?>
+                                <?php endif;?>
+                            <?php endif;  ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                    </tbody>
+                <?php else: ?>
+                    <?php if (!in_array($_item->getProductId(), $addonIds)): ?>
+                        <tbody>
+                            <?= $block->getItemHtml($_item) ?>
+                        </tbody>
+                    <?php endif; ?>
+                <?php endif; ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
+
+        <tfoot class="order-totals">
+        <?= $blockTotals->toHtml() ?>
+        </tfoot>
+    </table>
+    <?php if ($this->helper(\Magento\GiftMessage\Helper\Message::class)
+            ->isMessagesAllowed('order', $_order, $_order->getStore())
+        && $_order->getGiftMessageId()
+    ) : ?>
+        <?php $_giftMessage = $this->helper(\Magento\GiftMessage\Helper\Message::class)
+            ->getGiftMessage($_order->getGiftMessageId()); ?>
+        <?php if ($_giftMessage) : ?>
+            <br />
+            <table class="message-gift">
+                <tr>
+                    <td>
+                        <h3><?= $block->escapeHtml(__('Gift Message for this Order')) ?></h3>
+                        <strong><?= $block->escapeHtml(__('From:')) ?></strong> <?= $block->escapeHtml($_giftMessage->getSender()) ?>
+                        <br /><strong><?= $block->escapeHtml(__('To:')) ?></strong> <?= $block->escapeHtml($_giftMessage->getRecipient()) ?>
+                        <br /><strong><?= $block->escapeHtml(__('Message:')) ?></strong>
+                        <br /><?= $block->escapeHtml($_giftMessage->getMessage()) ?>
+                    </td>
+                </tr>
+            </table>
+        <?php endif; ?>
+    <?php endif; ?>
+<?php endif; ?>

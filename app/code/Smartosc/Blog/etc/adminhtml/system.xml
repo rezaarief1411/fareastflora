@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
+    <system>
+        <section id="blog" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="50">
+            <group id="general_settings" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="0">
+                <field id="short_description" type="text" translate="label comment" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="32">
+                    <label>Short Description</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

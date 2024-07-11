@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <mpanel>
+            <home_slider>
+            </home_slider>
+            <category_gift>
+                <gift-category>16</gift-category>
+            </category_gift>
+            <note_settings>
+                <enable>1</enable>
+                <pickup_note_limit>300</pickup_note_limit>
+                <delivery_note_limit>300</delivery_note_limit>
+            </note_settings>
+            <custom_scripts>
+                <custom_script><![CDATA[<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PGK7KZ8"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->]]></custom_script>
+            </custom_scripts>
+            <conf_report_service>
+                <enable>1</enable>
+            </conf_report_service>
+            <config_animation_effect>
+                <enable>1</enable>
+            </config_animation_effect>
+            <config_home_animation_effect>
+                <enable>0</enable>
+            </config_home_animation_effect>
+        </mpanel>
+        <smartosc_mpanel_cron>
+            <cron_expr>
+                <sync_promotion>* */1 * * *</sync_promotion>
+            </cron_expr>
+            <cron_sync_product>
+                <sync_product_option>* */1 * * *</sync_product_option>
+            </cron_sync_product>
+        </smartosc_mpanel_cron>
+    </default>
+</config>

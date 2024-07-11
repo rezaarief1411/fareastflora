@@ -1,0 +1,9 @@
+<div class="shipping-method-note delivery">
+    <!-- ko foreach: getRegion('delivery-note') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!--/ko-->
+    <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="shipping-method-checkbox" name="shipping-method-checkbox">
+        <label class="form-check-label" for="shipping-method-checkbox" >I authorize the courier to leave items outside doorstep when no one is present at this address.</label>
+    </div>
+</div>

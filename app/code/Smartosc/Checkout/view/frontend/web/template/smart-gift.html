@@ -1,0 +1,67 @@
+<div id="gift-card-form-pickup" class="gift-form form" method="post" data-role="pickup">
+    <div class="field">
+        <div class="control">
+            <input type="checkbox" class="checkbox"
+                   data-bind="checked: checkedGift, attr: {id: 'gift-card',name: 'gift card'}">
+            <label class="label" for="gift-card">
+                <span data-bind="i18n: 'I want a gift card'"></span>
+            </label>
+        </div>
+    </div>
+    <div class="giftcard-content" data-bind="fadeVisible: checkedGift">
+        <div class="gift-container">
+            <div class="row gift-list">
+                <!-- ko foreach: { data : giftOptions }-->
+                <div class="col-xs-4 col-md-4">
+                    <div class="field">
+                        <div class="control">
+                            <div class="gift-img">
+                                <img data-bind="attr: {src: $data.img_url, alt: $data.title, title: $data.title}"/>
+                            </div>
+                            <input type="checkbox" class="checkbox"
+                                   data-bind="checkedValue: $data, checked: $parent.chosenGift, value: $data.id, attr: {id: 'gift-'+$data.id, sku: $data.sku, name: 'gift-'+$data.id}">
+                            <label class="label" data-bind="attr: {for: 'gift-'+$data.id}">
+                                <span data-bind="i18n: $data.title"></span>
+                            </label>
+                            <div class="price-box">
+                                <!-- ko if: ($data.specialPrice == '$0.00') -->
+                                <span class="price" data-bind="text: ($data.price == '$0.00') ? 'Free' : $data.price, attr: {class: ($data.price == '$0.00') ? 'price free' : 'price'}"></span>
+                                <!-- /ko -->
+                                <!--  ko if: !($data.specialPrice == '$0.00') -->
+                                <span class="old-price"><span class="price" data-bind="text: $data.price"></span></span>
+                                <span class="special-price"><span class="price" data-bind="text: $data.specialPrice"></span></span>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /ko -->
+            </div>
+        </div>
+        <div class="row gift-mess">
+            <fieldset class="fieldset smart-gift">
+                <div class="col-xs-6 field from">
+                    <div class="control">
+                        <input class="input-text" type="text"
+                               data-bind="attr: {id: 'gift-from', name: $t('gift-from'), placeholder: $t('From')}" required />
+                        <label class="label" for="gift-from"><span data-bind="i18n: 'From'"></span></label>
+                    </div>
+                </div>
+                <div class="col-xs-6 field to">
+                    <div class="control">
+                        <input class="input-text" type="text"
+                               data-bind="attr: {id: 'gift-to', name: $t('gift-to'), placeholder: $t('To')}" required />
+                        <label class="label" for="gift-to"><span data-bind="i18n: 'To'"></span></label>
+                    </div>
+                </div>
+                <div class="col-xs-12 field mess">
+                    <div class="control">
+                                            <textarea class="input-text" type="text"
+                                                      data-bind="attr: {id: 'gift-message', name: $t('gift-message'), placeholder: $t('Message')}"></textarea>
+                        <label class="label" for="gift-message"><span data-bind="i18n: 'Message'"></span></label>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="salesrule_validator_process">
+		<observer name="label_list_sales_rules" instance="Smartosc\SalesRule\Observer\ApplyRule" />
+	</event>
+	<event name="sales_quote_collect_totals_before">
+		<observer name="clear_label_discount" instance="Smartosc\SalesRule\Observer\CleanLabelDiscount" />
+	</event>
+</config>

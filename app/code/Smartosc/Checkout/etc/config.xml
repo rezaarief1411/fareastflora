@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carriers>
+            <in_store_pickup>
+                <active>1</active>
+                <title>Store Pickup</title>
+                <name>Free</name>
+                <shipping_cost>0</shipping_cost>
+                <sallowspecific>0</sallowspecific>
+                <sort_order>15</sort_order>
+                <model>Smartosc\Checkout\Model\Carrier\StorePickupShipping</model>
+            </in_store_pickup>
+        </carriers>
+        <smartosc_special_date>
+            <special>
+                <disable_date>{"_1606461856747_747":{"date":"27-11-2020"},"_1606461863181_181":{"date":"29-11-2020"},"_1606461863801_801":{"date":"01-12-2020"},"_1606461869888_888":{"date":"04-12-2020"},"_1606461870486_486":{"date":"11-12-2020"}}</disable_date>
+            </special>
+        </smartosc_special_date>
+        <smartosc_general>
+            <auo_create_invoice>
+                <enable>1</enable>
+            </auo_create_invoice>
+            <pickup_time>
+                <content>12pm - 6pm</content>
+            </pickup_time>
+            <block_day>
+                <value>3</value>
+            </block_day>
+            <email_create_invoice>
+                <payment>paypal_express</payment>
+            </email_create_invoice>
+        </smartosc_general>
+    </default>
+</config>

@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
+    <extension_attributes for="Magento\Quote\Api\Data\AddressInterface">
+        <attribute code="pickup_comments" type="string" />
+        <attribute code="pickup_date" type="string" />
+        <attribute code="pickup_time" type="string" />
+        <attribute code="billing_email" type="string" />
+        <attribute code="delivery_date" type="string" />
+        <attribute code="delivery_note" type="string" />
+        <attribute code="delivery_stairs" type="string" />
+        <attribute code="shipping_type" type="string" />
+        <attribute code="billing_floor" type="string" />
+        <attribute code="billing_building" type="string" />
+        <attribute code="shipping_floor" type="string" />
+        <attribute code="shipping_building" type="string" />
+        <attribute code="gift_message_from" type="string" />
+        <attribute code="gift_message_to" type="string" />
+        <attribute code="gift_message" type="string" />
+        <attribute code="accept_authorize" type="string" />
+        <attribute code="authorize_message" type="string" />
+        <attribute code="pickup_store_name" type="string" />
+        <attribute code="pickup_store_address" type="string" />
+        <attribute code="pickup_store_state" type="string" />
+        <attribute code="pickup_store_zip" type="string" />
+    </extension_attributes>
+    <extension_attributes for="Magento\Checkout\Api\Data\ShippingInformationInterface">
+        <attribute code="pickup_comments" type="string" />
+        <attribute code="pickup_date" type="string" />
+        <attribute code="pickup_time" type="string" />
+        <attribute code="billing_email" type="string" />
+        <attribute code="delivery_date" type="string" />
+        <attribute code="delivery_note" type="string" />
+        <attribute code="delivery_stairs" type="string" />
+        <attribute code="shipping_type" type="string" />
+        <attribute code="billing_floor" type="string" />
+        <attribute code="billing_building" type="string" />
+        <attribute code="shipping_floor" type="string" />
+        <attribute code="shipping_building" type="string" />
+        <attribute code="gift_message_from" type="string" />
+        <attribute code="gift_message_to" type="string" />
+        <attribute code="gift_message" type="string" />
+        <attribute code="accept_authorize" type="string" />
+        <attribute code="authorize_message" type="string" />
+        <attribute code="pickup_store_name" type="string" />
+        <attribute code="pickup_store_address" type="string" />
+        <attribute code="pickup_store_state" type="string" />
+        <attribute code="pickup_store_zip" type="string" />
+    </extension_attributes>
+    <extension_attributes for="Magento\Quote\Api\Data\TotalsItemInterface">
+        <attribute code="sku" type="string" />
+        <attribute code="product_id" type="int" />
+        <attribute code="old_price" type="string" />
+        <attribute code="product_type" type="string" />
+        <attribute code="smart_options" type="Magento\Quote\Api\Data\TotalsItemInterface[]" />
+        <attribute code="is_addon" type="bool" />
+        <attribute code="use_pseudo" type="bool" />
+        <attribute code="report_service" type="Smartosc\CustomBundleProduct\Model\BundleProduct\ReportServiceInterface" />
+    </extension_attributes>
+
+</config>

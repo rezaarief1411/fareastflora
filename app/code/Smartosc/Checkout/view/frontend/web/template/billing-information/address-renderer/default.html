@@ -1,0 +1,28 @@
+<if args="visible() ">
+    <if args="address().firstname">
+        <span class="firstname" data-bind="text: address().firstname +' '+ address().lastname"></span>
+    </if>
+    <if args="address().street">
+        <span class="address">
+            <text args="_.values(address().street).join(', ')"/>
+            <if args="address().customAttributes && address().customAttributes.billing_floor">
+                , <text args="address().customAttributes.billing_floor" />
+            </if>
+            <if args="address().customAttributes && address().customAttributes.billing_building">
+                , <text args="address().customAttributes.billing_building" />
+            </if>
+            , <text args="getCountryName(address().countryId)" />
+            <text args="address().postcode" />
+        </span>
+    </if>
+    <if args="address().telephone">
+        <span class="telephone">
+            <a attr="'href': 'tel:' + address().telephone" text="address().telephone"></a>
+        </span>
+    </if>
+    <if args="address().email">
+        <span class="email">
+            <a attr="'href': 'mail:' + address().email" text="address().email"></a>
+        </span>
+    </if>
+</if>

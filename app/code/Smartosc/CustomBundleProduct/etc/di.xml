@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Bundle\Block\Checkout\Cart\Item\Renderer" type="Smartosc\CustomBundleProduct\Block\Render\BundleRender"/>
+    <type name="\Magento\Catalog\Model\Product\Type\AbstractType">
+        <plugin name="bundleTypePlugin" type="Smartosc\CustomBundleProduct\Plugin\BundleTypePlugin"/>
+    </type>
+    <type name="Magento\Quote\Model\Quote\Item\ToOrderItem">
+        <plugin name="has_repot_not_require_quote_to_order_item" type="Smartosc\CustomBundleProduct\Plugin\RepotNotRequireQuoteToOrderItem"/>
+    </type>
+</config>

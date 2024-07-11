@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="order_tab_info">
+           <referenceBlock name="order_items">
+               <action method="setTemplate">
+                   <argument name="template" xsi:type="string">Smartosc_CustomBundleProduct::order/view/items.phtml</argument>
+               </action>
+               <action method="setViewModel">
+                   <argument name="view_model" xsi:type="object">Smartosc\CustomBundleProduct\ViewModel\Adminhtml\OrderDetail</argument>
+               </action>
+           </referenceBlock>
+        </referenceBlock>
+    </body>
+</page>

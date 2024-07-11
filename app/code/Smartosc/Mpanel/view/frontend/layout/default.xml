@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<referenceBlock name="megamenu" class="Smartosc\Mpanel\Block\Mmegamenu"/>
+	<referenceContainer name="after.body.start">
+		<block class="Magento\Framework\View\Element\Template" name="smart_custom_scripts" after="-">
+			<action method="setTemplate">
+				<argument name="template" xsi:type="string">Smartosc_Mpanel::custom_scripts.phtml</argument>
+			</action>
+			<arguments>
+				<argument name="view_model" xsi:type="object">Smartosc\Mpanel\ViewModel\CustomScript</argument>
+			</arguments>
+		</block>
+	</referenceContainer>
+</page>

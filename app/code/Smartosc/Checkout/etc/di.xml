@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
+        <plugin name="smart_modified_checkout_layout_processor" type="Smartosc\Checkout\Plugin\Block\LayoutProcessor" sortOrder="1"/>
+    </type>
+    <type name="Magento\Quote\Model\ValidationRules\QuoteValidationComposite">
+        <arguments>
+            <argument name="validationRules" xsi:type="array">
+                <item name="AllowedCountryValidationRule" xsi:type="object">Magento\Quote\Model\ValidationRules\AllowedCountryValidationRule</item>
+                <item name="ShippingMethodValidationRule" xsi:type="object">Magento\Quote\Model\ValidationRules\ShippingMethodValidationRule</item>
+                <item name="PaymentMethodValidationRule" xsi:type="object">Magento\Quote\Model\ValidationRules\PaymentMethodValidationRule</item>
+                <item name="MinimumAmountValidationRule" xsi:type="object">Magento\Quote\Model\ValidationRules\MinimumAmountValidationRule</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Checkout\Api\GuestPaymentInformationManagementInterface">
+        <plugin name="validate-guest-agreements" disabled="true"/>
+    </type>
+    <type name="Magento\Checkout\Api\PaymentInformationManagementInterface">
+        <plugin name="validate-agreements" type="Magento\CheckoutAgreements\Model\Checkout\Plugin\Validation" disabled="true"/>
+    </type>
+    <type name="Magento\Checkout\Model\DefaultConfigProvider">
+        <plugin name="extend_config_provider" type="Smartosc\Checkout\Plugin\ExtendConfigProvider"/>
+    </type>
+	<type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="removeInvisibleProductFromActiveCart" xsi:type="object">Smartosc\Checkout\Console\RemoveInvisibleProductInActiveCart</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="Magento\Checkout\Block\Checkout\AttributeMerger" type="Smartosc\Checkout\Block\Checkout\AttributeMerger"/>
+
+    <preference for="Magento\Checkout\Model\ShippingInformationManagement" type="Smartosc\Checkout\Model\ShippingInformationManagement"/>
+    <preference for="Magento\Sales\Block\Order\Totals" type="Smartosc\Checkout\Block\Order\Totals"/>
+    <preference for="Magento\Sales\Block\Order\Invoice\Totals" type="Smartosc\Checkout\Block\Invoice\Totals"/>
+    <preference for="Magento\CatalogImportExport\Model\Import\Product\CategoryProcessor" type="Smartosc\Checkout\Model\Import\Product\CategoryProcessor"/>
+    <preference for="Magento\CatalogImportExport\Model\Import\Product\Option" type="Smartosc\Checkout\Model\Import\Product\Option"/>
+    <preference for="Magento\SalesSequence\Model\Sequence" type="Smartosc\Checkout\Model\Sequence\Sequence"/>
+    <type name="Magento\Checkout\Controller\Cart\Delete">
+        <plugin name="smartRemoveAddonProduct" type="Smartosc\Checkout\Plugin\Cart\RemoveAddonProduct"/>
+    </type>
+    <preference for="Magento\Checkout\Controller\Cart\Add"
+                type="Smartosc\Checkout\Controller\Cart\Add"/>
+    <type name="Magento\Checkout\Controller\Sidebar\RemoveItem">
+    	<plugin name="smartRemoveAddon" type="Smartosc\Checkout\Plugin\Sidebar\RemoveAddon"/>
+    </type>
+    <preference for="Magento\Checkout\CustomerData\DefaultItem" type="Smartosc\Checkout\CustomerData\CustomDefaultItem"/>
+    <type name="Magento\Quote\Model\Cart\Totals\ItemConverter">
+        <plugin name="addSmartOptions" type="Smartosc\Checkout\Plugin\Cart\Totals\ItemConverterPlugin" sortOrder="10"/>
+    </type>
+    <type name="Smartosc\Checkout\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Smartosc\Checkout\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">deliveryDateSetting</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Smartosc\Checkout\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="Magento\Quote\Observer\SubmitObserver" type="Smartosc\Checkout\Observer\Quote\SubmitObserver"/>
+</config>

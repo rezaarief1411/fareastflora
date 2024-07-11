@@ -1,0 +1,10 @@
+<?php
+/* @var \Smartosc\Blog\Block\Html\Finder $block */
+?>
+<!-- Search form -->
+<form class="form-inline d-flex justify-content-center md-form form-sm">
+  <input name="q" class="form-control form-control-sm mr-3 w-75" type="text" placeholder="Find your article"
+    aria-label="Search" value=<?php echo  $block->getRequest()->getParam('q', '');?>>
+    <i class="ion-ios-search-strong" aria-hidden="true"></i>
+</form>
+<button class="clear-filter" data-mage-init='{"redirectUrl": {"url":"<?= $block->getBaseUrl(); ?>blog"}}'><?php echo __("Clear Search") ?></button>

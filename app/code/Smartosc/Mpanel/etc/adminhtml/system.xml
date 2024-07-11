@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="mpanel" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="category_gift" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Gift Category</label>
+                <comment>This Category of Gift</comment>
+                <field id="gift_category" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Gift category</label>
+                </field>
+            </group>
+
+            <group id="sentosa" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Sentosa postal code and date condition</label>
+
+                <field id="postal_code" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sentosa postal code</label>
+                    <comment>The postal codes are separated by ",". If  the customer postal code matches, then he can only select the delivery on Wednesday, Friday and Sunday; other dates will be disabled.</comment>
+                    <validate>validate-christmas-postalcode</validate>
+                </field>
+            </group>
+
+            <group id="note_settings" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+            	<label>Note (Pickup/Delivery) settings</label>
+                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="pickup_note_limit" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Pick up note text limit</label>
+                </field>
+
+                <field id="delivery_note_limit" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Delivery note text limit</label>
+                </field>
+
+            </group>
+
+            <group id="banner" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Banners</label>
+                <comment>This Section Is For Uploading Banners</comment>
+                <field id="checkout" translate="label comment" type="image" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <comment>Please upload an image file, size less than 4Mb. Once uploaded, you can click on the thumbnail to view the large image. It will be the banner in checkout page.</comment>
+                    <label>Page Checkout</label>
+                    <backend_model>Smartosc\Mpanel\Model\Config\Backend\Image</backend_model>
+                    <validate>required-entry</validate>
+                    <base_url type="media" scope_info="1">wysiwyg/banner</base_url>
+                    <upload_dir config="system" scope_info="1">wysiwyg/banner</upload_dir>
+                </field>
+                <field id="login" translate="label comment" type="image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Page Login</label>
+                    <validate>required-entry</validate>
+                    <backend_model>Smartosc\Mpanel\Model\Config\Backend\Image</backend_model>
+                    <base_url type="media" scope_info="1">wysiwyg/banner</base_url>
+                    <upload_dir config="system" scope_info="1">wysiwyg/banner</upload_dir>
+                </field>
+                <field id="forgot_password" translate="label comment" type="image" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Page Forgot Password</label>
+                    <backend_model>Smartosc\Mpanel\Model\Config\Backend\Image</backend_model>
+                    <base_url type="media" scope_info="1">wysiwyg/banner</base_url>
+                    <upload_dir config="system" scope_info="1">wysiwyg/banner</upload_dir>
+                </field>
+                <field id="cart" translate="label comment" type="image" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Page Cart</label>
+                    <backend_model>Smartosc\Mpanel\Model\Config\Backend\Image</backend_model>
+                    <base_url type="media" scope_info="1">wysiwyg/banner</base_url>
+                    <upload_dir config="system" scope_info="1">wysiwyg/banner</upload_dir>
+                </field>
+                <field id="my_account" translate="label comment" type="image" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Page My Account</label>
+                    <backend_model>Smartosc\Mpanel\Model\Config\Backend\Image</backend_model>
+                    <base_url type="media" scope_info="1">wysiwyg/banner</base_url>
+                    <upload_dir config="system" scope_info="1">wysiwyg/banner</upload_dir>
+                </field>
+            </group>
+            <group id="custom_scripts" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Custom Scripts</label>
+                <comment>Custom Scripts</comment>
+                <field id="custom_script" translate="label comment" type="textarea" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom Scripts</label>
+                    <comment>The snippets are inserted after the body tag. e.g google tag manager ...</comment>
+                </field>
+            </group>
+            <group id="conf_report_service" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Config Report Service</label>
+                <field id="enable" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="product_id" translate="label comment" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Product Id</label>
+                    <validate>required-entry</validate>
+                    <comment>Report Service Product Id</comment>
+                </field>
+                <field id="image" translate="label comment" type="image" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <comment>Please upload an image file.</comment>
+                    <label>Report Service Image</label>
+                    <backend_model>Smartosc\Mpanel\Model\Config\Backend\Image</backend_model>
+                    <validate>required-entry</validate>
+                    <base_url type="media" scope_info="1">wysiwyg/banner</base_url>
+                    <upload_dir config="system" scope_info="1">wysiwyg/banner</upload_dir>
+                </field>
+            </group>
+            <group id="config_animation_effect" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Config Animation Effect</label>
+                <field id="enable" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>By selecting yes, you will apply a flower falling effect on the web page</comment>
+                </field>
+                <field id="image" translate="label comment" type="image" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <comment>Please upload an image file.</comment>
+                    <label>Animation Image</label>
+                    <backend_model>Smartosc\Mpanel\Model\Config\Backend\Image</backend_model>
+                    <validate>required-entry</validate>
+                    <base_url type="media" scope_info="1">wysiwyg/banner</base_url>
+                    <upload_dir config="system" scope_info="1">wysiwyg/banner</upload_dir>
+                </field>
+            </group>
+            <group id="config_home_animation_effect" translate="label" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50">
+                <label>Config animation on home</label>
+                <field id="enable" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Disable or enable animation effect</comment>
+                </field>
+            </group>
+        </section>
+        <tab id="smartosc_mpanel" translate="label" sortOrder="1">
+            <label>SmartOsc Connector</label>
+        </tab>
+        <section id="smartosc_mpanel_cron" translate="label" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Cron Sync</label>
+            <tab>smartosc_mpanel</tab>
+            <resource>Smartosc_Mpanel::system_config</resource>
+            <group id="cron_expr" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="sync_promotion" type="text" translate="label" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Sync Promotion</label>
+                </field>
+            </group>
+            <group id="cron_sync_product" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="sync_product_option" type="text" translate="label" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Sync Custom Option</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,101 @@
+<!-- ko foreach: smart_options -->
+<li class="item product product-item bundle-item" data-role="product-item">
+    <div class="product">
+        <div class="product-left product-top">
+            <!-- ko if: product_has_url -->
+            <a data-bind="attr: {href: product_url, title: product_name}" tabindex="-1" class="product-item-photo">
+            <span class="product-item-photo">
+                <span class="product-image-container" data-bind="style: {width: product_image.width + 'px'}">
+                    <span class="product-image-wrapper"  data-bind="style: {'padding-bottom': product_image.height/product_image.width*100 + '%'}">
+                        <img class="product-image-photo" data-bind="attr: {src: product_image.src, alt: product_image.alt}, style: {width: 'auto', height: 'auto'}" />
+                    </span>
+
+                </span>
+            </span>
+            </a>
+            <!-- /ko -->
+            <!-- ko ifnot: product_has_url -->
+            <span class="product-item-photo">
+            <span class="product-image-container" data-bind="style: {width: product_image.width + 'px'}">
+                <span class="product-image-wrapper"  data-bind="style: {'padding-bottom': product_image.height/product_image.width*100 + '%'}">
+                    <img class="product-image-photo" data-bind="attr: {src: product_image.src, alt: product_image.alt}, style: {width: 'auto', height: 'auto'}" />
+                </span>
+            </span>
+        </span>
+            <!-- /ko -->
+        </div>
+        <div class="product-item-details">
+            <strong class="product-item-name">
+                <!-- ko if: product_has_url -->
+                <a data-bind="attr: {href: product_url}, html: product_name"></a>
+                <!-- /ko -->
+                <!-- ko ifnot: product_has_url -->
+                <!-- ko text: product_name --><!-- /ko -->
+                <!-- /ko -->
+            </strong>
+            <div class="product-item-pricing">
+                <!-- ko if: canApplyMsrp -->
+                <div class="details-map">
+                    <span class="label" data-bind="i18n: 'Price'"></span>
+                    <span class="value" data-bind="i18n: 'See price before order confirmation.'"></span>
+                </div>
+                <!-- /ko -->
+                <!-- ko ifnot: canApplyMsrp -->
+                <div class="price-container">
+                    <!-- display text not required for fake product -->
+                    <!-- ko if: is_pseudo -->
+                    <span class="price-wrapper" data-bind="i18n: 'Not Required'"></span>
+                    <!-- /ko -->
+
+                    <!-- display price normally if there is non-faked product -->
+                    <!-- ko ifnot: is_pseudo-->
+                    <span class="price-wrapper" data-bind="html: product_price"></span>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+                <!-- ko ifnot: is_pseudo -->
+                <div class="details-qty qty">
+                    <!-- ko if: ($index()===0) -->
+                    <span class="edit-qty qty-minus" data-bind="attr: {'data-role': 'minusAction-minicart-'+parent_item_id, 'data-id': 'minicart-'+parent_item_id}"><i class="ion-ios-minus-outline"></i></span>
+                    <!-- /ko -->
+                    <!-- ko ifnot: (reportServiceProductId && qty < 1) -->
+                    <input data-bind="attr: {
+                           id: 'cart-item-'+parent_item_id+'-qty',
+                           'data-cart-item': parent_item_id,
+                           'data-item-qty': parent_qty,
+                           'data-id': 'minicart-'+parent_item_id
+                           }, value: parent_qty"
+                           type="number"
+                           size="4"
+                           class="item-qty form-control cart-item-qty"
+                           maxlength="12"/>
+                    <!-- /ko -->
+                    <!-- ko if: ($index()===0) -->
+                    <span class="edit-qty qty-plus" data-bind="attr: {'data-role': 'plusAction-minicart-'+parent_item_id , 'data-id': 'minicart-'+parent_item_id}"><i class="ion-ios-plus-outline"></i></span>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+                <button data-bind="attr: {
+                           id: 'update-cart-item-'+item_id,
+                           'data-cart-item': item_id,
+                           title: $t('Update')
+                           }"
+                        class="update-cart-item btn btn-primary margin-left10 btn-sm"
+                        style="display: none">
+                    <span data-bind="i18n: 'Update'"></span>
+                </button>
+            </div>
+            <!-- ko if: ($index()===0) -->
+            <div class="product actions">
+                <div class="secondary">
+                    <a href="#" data-bind="attr: {'data-cart-item': parent_item_id, title: $t('Remove item')}"
+                       class="action delete">
+                        <span class="ion-ios-close-empty" data-bind="i18n: ' '"></span>
+                    </a>
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+    </div>
+</li>
+<!-- /ko -->

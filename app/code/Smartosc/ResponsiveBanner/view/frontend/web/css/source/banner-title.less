@@ -1,0 +1,131 @@
+@screen__s: 480px;
+@screen__m: 768px;
+@screen__m__1: 769px;
+
+.carousel-container {
+    .item-image {
+        position: relative;
+        .banner-title-contaner {
+            position: absolute;
+            .banner-title {
+                font-family: sans-serif;
+                display: flex;
+                align-items: center;
+                padding: 20px;
+                margin: 50px;
+                resize: horizontal;
+                height: fit-content;
+                .url-title{
+                    font-size: 36px;
+                }
+            }
+        }
+        .owl-image img {
+            width: 100%;
+        }
+    }
+
+    .vertical-top .banner-title-contaner {
+        top: 0;
+    }
+
+    .vertical-bottom .banner-title-contaner {
+        bottom: 0;
+    }
+
+    .vertical-middle .banner-title-contaner {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .horizontal-left .banner-title-contaner {
+        left: 0;
+    }
+
+    .horizontal-right .banner-title-contaner {
+        right: 0;
+    }
+
+    .horizontal-center .banner-title-contaner {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .horizontal-center.vertical-middle .banner-title-contaner {
+        transform: translate(-50%, -50%);
+    }
+
+    .owl-carousel {
+        .owl-nav {
+            [class*="owl-"] {
+                top: 47%;
+                font-size: 50px;
+                width: 50px;
+                height: 100px;
+            }
+        }
+    }
+}
+
+@media only screen and (min-width: @screen__m__1) {
+    .carousel-container {
+        .item-image {
+            .banner-title-contaner {
+                .banner-title {
+                    background-color: unset !important;
+                }
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: @screen__m) {
+    .carousel-container {
+        .item-image {
+            position: unset;
+            display: block;
+            .banner-title-contaner {
+                position: unset;
+                .banner-title {
+                    max-width: unset;
+                    padding: 15px;
+                    margin: 0px;
+                    width: 100%;
+                    .url-title{
+                        font-size: 24px;
+                    }
+                }
+            }
+        }
+        .owl-carousel {
+            .owl-nav {
+                [class*="owl-"] {
+                    top: 40%;
+                    font-size: 30px;
+                    width: 30px;
+                    height: 60px;
+                }
+            }
+        }
+    }
+}
+@media only screen and (max-width: @screen__s) {
+    .carousel-container {
+        .item-image {
+            .banner-title-contaner {
+                .banner-title {
+                    .url-title{
+                        font-size: 18px;
+                    }
+                }
+            }
+        }
+        .owl-carousel {
+            .owl-nav {
+                [class*="owl-"] {
+                    top: 30%;
+                }
+            }
+        }
+    }
+}

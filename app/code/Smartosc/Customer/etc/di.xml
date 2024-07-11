@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Customer\Block\Form\Login\Info" type="Smartosc\Customer\Block\Form\Login\Info"/>
+    <preference for="Magento\Customer\Controller\Account\CreatePost" type="Smartosc\Customer\Controller\Account\CreatePost"/>
+    <type name="Magento\Customer\Controller\Account\Logout">
+        <plugin name="Smartosc_Customer_LogoutPlugin" type="Smartosc\Customer\Plugin\Customer\Controller\Account\LogoutPlugin" />
+    </type>
+    <type name="Magento\Customer\Block\Account\RegisterLink">
+        <plugin name="Smartosc_Customer_CustomRegisterLink" type="Smartosc\Customer\Plugin\Customer\Block\Account\CustomRegisterLink" />
+    </type>
+    <preference for="Magento\Customer\Controller\Address\FormPost" type="Smartosc\Customer\Controller\Address\FormPost"/>
+</config>

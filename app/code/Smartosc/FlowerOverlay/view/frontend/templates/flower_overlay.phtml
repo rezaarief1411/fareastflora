@@ -1,0 +1,24 @@
+<?php
+    /** @var \Magento\Framework\View\Element\Template $block */
+    $flowerHelper = $this->helper("Smartosc\FlowerOverlay\Helper\Data");
+?>
+<div class="flower-overlay">
+    <?php
+    if($flowerHelper->getLeftImageUrl()):
+        ?>
+        <div class="left-image">
+            <img src="<?=$flowerHelper->getLeftImageUrl()?>" alt="" class="img img-left-overlay">
+        </div>
+    <?php
+    endif;
+    ?>
+    <?php
+    if ($flowerHelper->getRightImageUrl()):
+        ?>
+        <div class="right-image">
+            <img src="<?=$flowerHelper->getRightImageUrl()?>" alt="" class="img img-right-overlay">
+        </div>
+    <?php
+    endif;
+    ?>
+</div>

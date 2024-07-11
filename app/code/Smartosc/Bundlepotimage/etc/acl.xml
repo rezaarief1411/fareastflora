@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+			<resource id="Magento_Backend::admin">
+				<resource id="Magento_Backend::mgs">
+					<resource id="Smartosc_Bundlepotimage::bundlepotimage" title="Bundle&amp;Pot Images" sortOrder="100">
+						<resource id="Smartosc_Bundlepotimage::manage" title="Manage Preview Images" sortOrder="10">
+							<resource id="Smartosc_Bundlepotimage::save" title="Save Item" sortOrder="10" />
+							<resource id="Smartosc_Bundlepotimage::delete" title="Delete Item" sortOrder="20" />
+						</resource>
+					</resource>
+				</resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

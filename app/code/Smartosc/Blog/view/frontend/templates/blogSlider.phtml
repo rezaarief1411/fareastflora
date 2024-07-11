@@ -1,0 +1,16 @@
+<?php
+$sliderHelper = $this->helper('Smartosc\ResponsiveBanner\Helper\Data');
+$blockSlider = $sliderHelper->getSlidersForBlog();
+$sliderDescription = $sliderHelper->getShortDescription();
+if ($blockSlider && $blockSlider->getSliderId()) {
+	echo $block->getLayout()->createBlock('Mageplaza\BannerSlider\Block\Widget')->setSliderId($blockSlider->getSliderId())->toHtml();
+}
+?>
+    <a id="blog-category"></a>
+<?php if($sliderDescription): ?>
+	<div class="breadcrumbs">
+	    <div class="breadcrumbs-content">
+		    <?php echo $sliderHelper->getShortDescription();?>
+	    </div>
+	</div>
+<?php endif; ?>

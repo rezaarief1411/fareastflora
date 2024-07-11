@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Sales:etc/sales.xsd">
+    <section name="quote">
+        <group name="totals">
+            <item name="base_original_subtotal" instance="Smartosc\Checkout\Model\Quote\Address\Total\BaseOriginalPrice" sort_order="400"/>
+            <item name="total_saving" instance="Smartosc\Checkout\Model\Quote\Address\Total\TotalSaving" sort_order="401"/>
+        </group>
+    </section>
+</config>

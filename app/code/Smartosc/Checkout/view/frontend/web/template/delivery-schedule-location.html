@@ -1,0 +1,21 @@
+<div class="field location">
+    <label class="label" for="stores_option" data-bind="text: label"></label>
+    <select class="select" name="stores_option" id="stores_option"
+            data-bind="
+        options: seedData,
+        optionsText: 'name',
+        value: selectedStore,
+        selectedOptions: selectedStore(),
+        event: {change: onStoreChange(selectedStore())};">
+    </select>
+    <!-- ko with: selectedStore -->
+    <div class="store-info">
+        <h5><strong class="store-name" data-bind="text: name"></strong></h5>
+        <p>
+            <span class="store-address" data-bind="text: street_address"></span>
+            <span class="store-state" data-bind="text: state"></span>
+        </p>
+        <p class="store-zip" data-bind="text: zipcode"></p>
+    </div>
+    <!-- /ko -->
+</div>

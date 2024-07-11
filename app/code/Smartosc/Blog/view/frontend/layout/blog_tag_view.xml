@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
+      xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+    <referenceContainer name="div.sidebar.main">
+        <referenceContainer name="div.sidebar.additional">
+            <referenceContainer name="sidebar.additional">
+                <referenceBlock name="brand.sidebar" remove="true"/>
+            </referenceContainer>
+        </referenceContainer>
+    </referenceContainer>
+</page>

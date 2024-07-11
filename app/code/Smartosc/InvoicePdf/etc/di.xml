@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Sales\Model\Order\Pdf\Invoice" type="Smartosc\InvoicePdf\Model\Order\Pdf\CustomInvoice" />
+    <preference for="Magento\Sales\Model\Order\Pdf\Items\Invoice\DefaultInvoice" type="Smartosc\InvoicePdf\Model\Order\Pdf\Invoice\CustomDefaultInvoice" />
+    <preference for="Magento\Sales\Model\Order\Pdf\Shipment" type="Smartosc\InvoicePdf\Model\Order\Pdf\CustomShipment"/>
+    <preference for="Magento\Customer\Block\Address\Renderer\DefaultRenderer" type="Smartosc\InvoicePdf\Model\Order\Address\Renderer"/>
+    <preference for="Magento\Sales\Model\Order\Address\Renderer" type="Smartosc\InvoicePdf\Model\Order\Address\AddressRenderer"/>
+	<preference for="Magento\Sales\Model\Order\Pdf\Items\Shipment\DefaultShipment" type="Smartosc\InvoicePdf\Model\Order\Pdf\Shipment\CustomDefaultShipment"/>
+</config>

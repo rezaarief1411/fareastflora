@@ -1,0 +1,33 @@
+<!-- ko if: (isVisible()) -->
+<!-- ko ifnot: (window.pickupTab) -->
+<div class="shipping-information">
+    <div class="ship-to">
+        <div class="shipping-information-title">
+            <span data-bind="i18n: 'Ship To:'"></span>
+            <button class="action action-edit" data-bind="click: back">
+                <span data-bind="i18n: 'edit'"></span>
+            </button>
+        </div>
+        <div class="shipping-information-content">
+            <!-- ko foreach: getRegion('ship-to') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+    </div>
+</div>
+<!--/ko-->
+<!-- ko if: (window.pickupTab) -->
+<div class="shipping-information">
+    <div class="ship-to">
+        <div class="shipping-information-title">
+            <span data-bind="i18n: 'Store Pickup'"></span>
+        </div>
+        <div class="shipping-information-content">
+            <!-- ko foreach: getRegion('ship-to') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+    </div>
+</div>
+<!--/ko-->
+<!--/ko-->

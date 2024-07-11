@@ -1,0 +1,103 @@
+<?php
+
+/* @var \Smartosc\ResponsiveBanner\Block\Widget $block */
+
+use Mageplaza\BannerSlider\Model\Config\Source\Type;
+
+$banners = $block->getBannerCollection();
+$check   = is_array($banners) ? !empty($banners) : $banners->getSize();
+if ($check) : ?>
+    <?php
+    $sliderId      = $block->getSliderId() . uniqid('-', false);
+    $sliderOptions = $block->getBannerOptions(); ?>
+    <div class="carousel-container">
+        <div id="banner-slider-carousel">
+            <?php $iterator = 1; ?>
+            <div id="bannerslider-list-items-<?= /* @noEscape */ $sliderId ?>"
+                 class="owl-carousel owl-theme">
+                <?php foreach ($banners as $banner) : ?>
+                    <?php
+                    $bnType  = $banner->getType();
+                    $bnTitle = $banner->getTitle();
+                    $bnUrl   = $banner->getUrlBanner();
+                    $bnImg   = $banner->getImageUrl();
+
+                    $bnPositionH = $banner->getPosition();
+                    $bnPositionV = $banner->getVerticalPosition();
+                    $bnColor     = $banner->getColor();
+                    $bnBgColor   = $banner->getBackgroundColor();
+                    $urlForBannerTitle = $banner->getUrlForBannerTitle();
+
+                    switch ($bnPositionH) {
+                        case 1:
+                            $horizontal_position = ' horizontal-left ';
+                            break;
+                        case 2:
+                            $horizontal_position = ' horizontal-right ';
+                            break;
+                        case 3:
+                            $horizontal_position = ' horizontal-center ';
+                            break;
+                        default:
+                            $horizontal_position = '';
+                            break;
+                    }
+
+                    switch ($bnPositionV) {
+                        case 1:
+                            $vertical_position = ' vertical-top ';
+                            break;
+                        case 2:
+                            $vertical_position = ' vertical-middle ';
+                            break;
+                        case 3:
+                            $vertical_position = ' vertical-bottom ';
+                            break;
+                        default:
+                            $vertical_position = '';
+                            break;
+                    }
+
+                    ?>
+                    <?php if (($bnType === Type::CONTENT && empty($banner->getContent())) || ($bnType === Type::IMAGE && empty($banner->getImage()))) : continue; ?>
+                    <?php endif; ?>
+                    <?= ($iterator++ === 1) ? '<div class="banner-item banner-slider">' : '</div><div class="banner-item banner-slider">' ?>
+                    <?php if ($bnType === Type::CONTENT) : ?>
+                        <div class="item-content">
+                            <?= /* @noEscape */ $block->getPageFilter($banner->getContent()) ?>
+                        </div>
+                    <?php else : #image type?>
+                        <div class="item-image <?= $horizontal_position . $vertical_position?>" >
+                            <?php if (!empty($bnUrl)) : ?>
+                                <a class="owl-image"
+                                   href="<?= $block->escapeUrl($bnUrl) ?>" <?= /* @noEscape */ ($banner->getNewtab() === '1') ? 'target="_blank"' : '' ?>>
+                                    <img class="img-responsive" src="<?= $block->escapeUrl($bnImg) ?>" alt="<?= $block->escapeHtml($bnTitle) ?>">
+                                </a>
+                                <div class="banner-title-contaner">
+                                    <?php if (!empty($bnTitle)) : ?>
+                                        <div class="banner-title <?= $horizontal_position ?>" style="background-color: <?= $bnBgColor ?>;">
+                                            <a class="url-title" style="color: <?= $bnColor ?>" href="<?php echo $block->escapeUrl($urlForBannerTitle);?>" <?= /* @noEscape */ ($banner->getNewtab() === '1') ? 'target="_blank"' : '' ?>>
+                                                <span ><?= $block->escapeHtml($bnTitle) ?></span>
+                                            </a>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php else : ?>
+                                <img class="owl-image img-responsive" src="<?= $block->escapeUrl($bnImg) ?>"
+                                     title="<?= $block->escapeHtml($bnTitle) ?>" alt="<?= $block->escapeHtml($bnTitle) ?>">
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                    <?= ($iterator === count($banners) + 1) ? '</div>' : '' ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?= $block->getPagerHtml() ?>
+    </div>
+
+    <script>
+        require(['jquery', 'mageplaza/core/owl.carousel'], function ($) {
+            $('#bannerslider-list-items-<?= /* @noEscape */ $sliderId ?>').owlCarousel(<?= /* @noEscape */ $sliderOptions ?>);
+        });
+    </script>
+<?php endif; ?>

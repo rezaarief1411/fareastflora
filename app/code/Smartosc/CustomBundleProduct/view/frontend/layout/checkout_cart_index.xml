@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="checkout.cart.form">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Smartosc_CustomBundleProduct::cart/form.phtml</argument>
+            </action>
+            <referenceBlock name="checkout.cart.item.renderers">
+                <referenceBlock name="checkout.cart.item.renderers.bundle">
+                    <action method="setViewModel">
+                        <argument name="view_model" xsi:type="object">Smartosc\CustomBundleProduct\ViewModel\Cart\Item\Bundle\Renderer</argument>
+                    </action>
+                    <referenceBlock name="checkout.cart.item.renderers.bundle.actions">
+                        <referenceBlock name="checkout.cart.item.renderers.bundle.actions.edit" remove="true"/>
+                    </referenceBlock>
+                </referenceBlock>
+            </referenceBlock>
+            <referenceBlock name="checkout.cart.item.renderers.simple">
+                <referenceBlock name="checkout.cart.item.renderers.simple.actions">
+                    <referenceBlock name="checkout.cart.item.renderers.simple.actions.edit" remove="true"/>
+                </referenceBlock>
+            </referenceBlock>
+            <referenceBlock name="checkout.cart.item.renderers.configurable">
+                <referenceBlock name="checkout.cart.item.renderers.configurable.actions">
+                    <referenceBlock name="checkout.cart.item.renderers.configurable.actions.edit" remove="true"/>
+                </referenceBlock>
+            </referenceBlock>
+        </referenceBlock>
+    </body>
+</page>

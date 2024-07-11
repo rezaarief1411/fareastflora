@@ -1,0 +1,9 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Smartosc\Mpanel\ViewModel\CustomScript $viewModel */
+$viewModel = $block->getViewModel();
+$googleTagScript = $viewModel->getGoogleTagScript();
+?>
+<?php if ($googleTagScript) : ?>
+    <?=$googleTagScript?>
+<?php endif; ?>

@@ -1,0 +1,155 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php /* @var $block \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option\Radio */ ?>
+<?php $_option = $block->getOption(); ?>
+<?php $_selections  = $_option->getSelections(); ?>
+<?php $_default     = $_option->getDefaultSelection(); ?>
+<?php list($_defaultQty, $_canChangeQty) = $block->getDefaultValues(); ?>
+
+<div class="field option <?= ($_option->getRequired()) ? ' required': '' ?>" data-mage-init='{"bundleSlider":{}}'>
+
+    <div class="control">
+        <div class="nested options-list">
+            <?php if ($block->showSingle()) : ?>
+            <input type="hidden"
+                   class="bundle-option-<?= (int)$_option->getId() ?>  product bundle option"
+                   name="bundle_option[<?= (int)$_option->getId() ?>]"
+                   value="<?= (int)$_selections[0]->getSelectionId() ?>"
+                   id="bundle-option-<?= (int)$_option->getId() ?>-<?= (int)$_selections[0]->getSelectionId() ?>"
+                   checked="checked"
+            />
+            <?php else :?>
+                <label class="label">
+                    <span><?= $block->escapeHtml($_option->getTitle()) ?></span>
+                </label>
+            <?php if (!$_option->getRequired()) : ?>
+                <div class="field choice">
+                    <input type="radio"
+                           class="radio product bundle option"
+                           id="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>"
+                           name="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>]"
+                           data-selector="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>]"
+                        <?= ($_default && $_default->isSalable())?'':' checked="checked" ' ?>
+                           value=""/>
+                    <label class="label" for="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>">
+                        <span><?= $block->escapeHtml(__('None')) ?></span>
+                    </label>
+                </div>
+            <?php endif; ?>
+                <ol class="bundle-option-slider">
+                    <?php foreach ($_selections as $_selection) : ?>
+                        <li class="field choice">
+                            <?php
+                            $_imageHelper = \Magento\Framework\App\ObjectManager::getInstance()->get('Magento\Catalog\Helper\Image');
+
+                            $image = $_imageHelper->init($_selection, 'small_image', ['type' => 'small_image'])->keepAspectRatio(true)->resize('200', '200')->getUrl(); ?>
+                            <input type="radio"
+                                   class="radio product bundle option change-container-classname radio-price"
+                                   id="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>-<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>"
+                                <?php if ($_option->getRequired()) { echo 'data-validate="{\'validate-one-required-by-name\':true}"'; }?>
+                                   name="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>]"
+                                   data-selector="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>]"
+                                <?php if ($block->isSelected($_selection)) { echo ' checked="checked"'; } ?>
+                                   value="<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>"
+                                   data-in-stock="<?php echo $_selection->getIsSalable() ? 'true' : 'false' ?>"
+                                   data-checked="false"/>
+
+                            <label class="label"
+                                   for="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>-<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>">
+                                <span><?= /* @noEscape */ $block->getSelectionTitlePrice($_selection) ?></span>
+                                <br/>
+
+                                <div class="bundle-option-image" id="bundle-image-<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>"><img src="<?php echo $image; ?>" /></div>
+                            </label>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+                <!-- Place holder -->
+                <input class="hidden-input" name="bundlespot" value="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>]"/>
+                <!--// Place holder -->
+                <script type="text/javascript">
+                    require([
+                        'jquery',
+                        'domReady!'
+                    ], function ($) {
+                        $('input[type=radio][name^=bundle_option]').click(function() {
+                            var repotPrice = $(this).closest('.product-top').find('.price-wrapper:first').attr('data-repot-price');
+                            var optPrice = $(this).siblings().find('.price-wrapper').attr('data-price-amount');
+                            var productPrice = $(this).closest('.product-top').find('.price-wrapper:first').attr('data-price-amount');
+                            var minOptPrice = [];
+                            var elm = $(this).closest('.slick-track').find('.field.choice');
+                            $(elm).each(function () {
+                                minOptPrice.push($(this).find('.price-wrapper').attr('data-price-amount'));
+                            });
+                            let originPrice = productPrice - Math.min.apply(Math,minOptPrice);
+                            if ($(this).attr('data-checked') == 'true') {
+                                $(this).closest('.fieldset-bundle-options').find('.bundle-option-image').removeClass('disable');
+                                $(this).closest('.fieldset-bundle-options').find('.bundle-option-image').removeClass('active');
+                                $(this).attr('data-checked', 'false');
+                                $(this).prop('checked', false);
+                                $(this).closest('.product-top').find('.price-wrapper:first').attr('data-pot-price', (parseFloat(originPrice)).toFixed(2));
+                                if  (repotPrice == undefined) {
+                                    $(this).closest('.product-top').find('.price:first').text('$' + (parseFloat(originPrice)).toFixed(2));
+                                } else {
+                                    $(this).closest('.product-top').find('.price:first').text('$' + (parseFloat(originPrice) + parseFloat(repotPrice)).toFixed(2));
+                                };
+                                if ($(this).closest('.product-top').find('.old-price').length > 0) {
+                                    let productPrice_old = $(this).closest('.product-top').find('.old-price .price-wrapper').attr('data-price-amount');
+                                    let originPrice_old = productPrice_old - Math.min.apply(Math,minOptPrice);
+                                    if  (repotPrice == undefined) {
+                                        $(this).closest('.product-top').find('.old-price .price').text('$' + (parseFloat(originPrice_old)).toFixed(2));
+                                    } else {
+                                        $(this).closest('.product-top').find('.old-price .price').text('$' + (parseFloat(originPrice_old) + parseFloat(repotPrice)).toFixed(2));
+                                    };
+                                };
+                                return ;
+                            };
+                            $(this).closest('.fieldset-bundle-options').find('.change-container-classname').attr('data-checked', 'false');
+                            $(this).attr('data-checked', 'true');
+                            $(this).closest('.fieldset-bundle-options').find('.bundle-option-image').addClass('disable');
+                            $(this).closest('.fieldset-bundle-options').find('.bundle-option-image').removeClass('active');
+                            $(this).closest(".field.choice").find(".bundle-option-image").removeClass("disable");
+                            $(this).closest(".field.choice").find(".bundle-option-image").addClass("active");
+                            $(this).closest('.product-top').find('.price-wrapper:first').attr('data-pot-price', (parseFloat(originPrice) + parseFloat(optPrice)).toFixed(2));
+
+                            if  (repotPrice == undefined) {
+                                $(this).closest('.product-top').find('.price:first').text('$' + (parseFloat(originPrice) + parseFloat(optPrice)).toFixed(2));
+                            } else {
+                                $(this).closest('.product-top').find('.price:first').text('$' + (parseFloat(originPrice) + parseFloat(repotPrice) + parseFloat(optPrice)).toFixed(2));
+                            };
+                            if ($(this).closest('.product-top').find('.old-price').length > 0) {
+                                let productPrice_old = $(this).closest('.product-top').find('.old-price .price-wrapper').attr('data-price-amount');
+                                let originPrice_old = productPrice_old - Math.min.apply(Math,minOptPrice);
+                                if  (repotPrice == undefined) {
+                                    $(this).closest('.product-top').find('.old-price .price').text('$' + (parseFloat(originPrice_old) + parseFloat(optPrice)).toFixed(2));
+                                } else {
+                                    $(this).closest('.product-top').find('.old-price .price').text('$' + (parseFloat(originPrice_old) + parseFloat(repotPrice) + parseFloat(optPrice)).toFixed(2));
+                                };
+                            }
+                        });
+                    });
+                </script>
+                <div id="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>-container"></div>
+            <?php endif; ?>
+
+            <div class="field qty qty-holder">
+                <label class="label" for="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>-qty-input">
+                    <span><?= $block->escapeHtml(__('Quantity')) ?></span>
+                </label>
+                <div class="control">
+                    <input <?php if (!$_canChangeQty) { echo ' disabled="disabled"'; } ?>
+                            id="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>-qty-input"
+                            class="input-text qty<?php if (!$_canChangeQty) { echo ' qty-disabled'; } ?>"
+                            type="number"
+                            name="bundle_option_qty[<?= $block->escapeHtmlAttr($_option->getId()) ?>]"
+                            data-selector="bundle_option_qty[<?= $block->escapeHtmlAttr($_option->getId()) ?>]"
+                            value="<?= $block->escapeHtmlAttr($_defaultQty) ?>"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
