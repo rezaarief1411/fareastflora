@@ -40,23 +40,25 @@ class GetTimeSlot extends \Magento\Framework\App\Action\Action
 
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $helper = $objectManager->get("\Fef\CustomShipping\Helper\Data");
+        $outletId = $helper->getConfig("carriers/custom/outlet_id");
 
         $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         $dataTimeslot = [];
         try {
             
             $whoteData = $this->context->getRequest()->getParams();
+            $logger->info("whoteData : ".print_r($whoteData,true));
+
             if(isset($whoteData["delivery_date"])){
                 $dateParams = strtotime ($whoteData["delivery_date"]); 
-                $dateParams =  date ( 'Y-m-d' , $dateParams );
+                $dateParams =  date ( 'Y-m-d' , strtotime('+3 days',$dateParams));
 
                 $url = $helper->getConfig("carriers/custom/base_url")."generate-timeslot";
-
-
                 $apiParams = [
                     "date" => $dateParams,
                     "daysCount" => 1,
                     "orderMode" => "DELIVERY",
+                    "outletId" => $outletId
                 ];
                 $resGetSlotResult = $helper->setCurl($url,"POST",$apiParams,1);
                 if($helper->getDebugMode()==1){
