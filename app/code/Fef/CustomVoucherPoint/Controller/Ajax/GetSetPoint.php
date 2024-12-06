@@ -98,17 +98,8 @@ class GetSetPoint extends \Magento\Framework\App\Action\Action
 
     private function setPoint($respData,$customerId)
     {
-        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/customer-login.log');
-        $logger = new \Zend_Log();
-        $logger->addWriter($writer);
-        
-        // $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        // $helperData = $objectManager->get('\Fef\CustomVoucherPoint\Helper\Data');
-
-
         if(isset($respData["points"]["balance"]) && $respData["points"]["balance"] != NULL && $respData["points"]["balance"] != ""){
             $this->vocHelper->addZokuPoint($customerId, $respData["points"]["balance"]);
-            // $this->addZokuPoint($customerId, $respData["points"]["balance"]);
         }
     }
 }

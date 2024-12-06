@@ -184,7 +184,7 @@ class Totals extends \Smartosc\Checkout\Block\Order\Totals
                 [
                     'code' => 'shipping',
                     'field' => 'shipping_amount',
-                    'value' => $this->getSource()->getShippingAmount(),
+                    'value' => $this->getSource()->getShippingInclTax(),
                     'label' => $label,
                 ]
             );

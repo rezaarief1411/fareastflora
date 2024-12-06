@@ -198,7 +198,7 @@ class SyncEmail extends \Magento\Framework\App\Action\Action
 
                     $respArray = $this->customerHelper->checkProsellerByEmail($email);
                     $logger->info("===================== checkProsellerByEmail ELSE =======================");
-                    // $logger->info(print_r($respArray,true));
+                    $logger->info(print_r($respArray,true));
                     
                     if(isset($respArray["status"]) && $respArray["status"]=="success"){
                         
@@ -210,6 +210,8 @@ class SyncEmail extends \Magento\Framework\App\Action\Action
 
                         // CREATE CUSTOMER IN MAGENTO
                         $this->customerHelper->createCustomer($respArray["data"]);
+
+                        $logger->info("===================== CREATE CUSTOMER IN MAGENTO =======================");
                                       
 
                         $resultJson = $this->customerHelper->sendOtp($email);
@@ -260,16 +262,23 @@ class SyncEmail extends \Magento\Framework\App\Action\Action
 
         $cattrPhonenumberValue = $customerModel->getCustomAttribute('phone_number');
         
-        if($cattrPhonenumberValue){
 
-            if(strpos($cattrPhonenumberValue->getValue(),"+")==0){
+        
+
+        if($cattrPhonenumberValue){
+            $logger->info("cattrPhonenumberValue : ".$cattrPhonenumberValue->getValue());
+            $logger->info("strpos : ".strpos($cattrPhonenumberValue->getValue(),"+"));
+            if(strpos($cattrPhonenumberValue->getValue(),"+")=== TRUE){
                 $phoneNumber = $cattrPhonenumberValue->getValue();
             }else{
                 $phoneNumber = "+65".$cattrPhonenumberValue->getValue();
+                $logger->info("cattrPhonenumberValue : ".$cattrPhonenumberValue->getValue());
             }
         }else{
             $phoneNumber = "+6500000000";
         }
+
+        $logger->info("phoneNumber : ".$phoneNumber);
         // $phoneNumber = $cattrPhonenumberValue ? "+65".$cattrPhonenumberValue->getValue() : null;
         
         $customerName = $customer->getFirstname();
@@ -366,15 +375,16 @@ class SyncEmail extends \Magento\Framework\App\Action\Action
 
         $voucherResp = [];
         if(isset($respData["vouchers"])){
+            $logger->info(print_r($respData["vouchers"],true));
             foreach ($respData["vouchers"] as $keyV => $valV) {
                 if(isset($valV["id"])){
-                    $logger->info($valV["id"]." || ".$valV["voucherCategory"]);
+                    // $logger->info($valV["id"]." || ".$valV["voucherCategory"]);
                     if($valV["voucherCategory"]=="DISCOUNT"){
                         $voucherDetail = [
                             "id" => $valV["id"],
                             "name" => $valV["name"],
                             "type" => $valV["type"],
-                            "value" => $valV["value"],
+                            "value" => isset($valV["value"]) ? $valV["value"] : 0,
                             "serialNumber" => $valV["serialNumber"]
                         ];
                         array_push($voucherResp,$voucherDetail);
@@ -429,7 +439,7 @@ class SyncEmail extends \Magento\Framework\App\Action\Action
             $savedAmount = $pointAmount;
             $comment = "updated point from proseller";
 
-            $logger->info("comment : ".$comment." || $savedAmount");
+            // $logger->info("comment : ".$comment." || $savedAmount");
 
             if($savedAmount != NULL && $resultData[0]['points_left'] != NULL){
                 try {
@@ -445,7 +455,7 @@ class SyncEmail extends \Magento\Framework\App\Action\Action
                 } catch (\Exception $ex) {
                     $logger->info("Exception : ".$ex->getMessage());
                 }
-                $logger->info($comment." to $customerId with amount $savedAmount");
+                // $logger->info($comment." to $customerId with amount $savedAmount");
             }
         }
     }

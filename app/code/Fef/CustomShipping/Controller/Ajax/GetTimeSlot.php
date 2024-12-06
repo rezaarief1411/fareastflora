@@ -47,7 +47,6 @@ class GetTimeSlot extends \Magento\Framework\App\Action\Action
         try {
             
             $whoteData = $this->context->getRequest()->getParams();
-            $logger->info("whoteData : ".print_r($whoteData,true));
 
             if(isset($whoteData["delivery_date"])){
                 $dateParams = strtotime ($whoteData["delivery_date"]); 
@@ -62,13 +61,20 @@ class GetTimeSlot extends \Magento\Framework\App\Action\Action
                 ];
                 $resGetSlotResult = $helper->setCurl($url,"POST",$apiParams,1);
                 if($helper->getDebugMode()==1){
-                    $logger->info("apiParams : ".json_encode($apiParams));
-                    $logger->info("resGetSlotResult : ".json_encode($resGetSlotResult));
+                    // $logger->info("apiParams : ".json_encode($apiParams));
+                    // $logger->info("resGetSlotResult : ".json_encode($resGetSlotResult));
                 }
                 $resGetSlotResultArray = json_decode($resGetSlotResult,true);
+
                 if($resGetSlotResultArray["status"]=="success"){
                     $dataTimeslot = $resGetSlotResultArray["data"][0]["timeSlot"];
                 }
+                // else{
+                //     $dataTimeslot = array(
+                //         "13:00 - 14:00",
+                //         "14:00 - 15:00"
+                //     );
+                // }
                 $resultJson = $this->setResult(true,"Process Done",$dataTimeslot);
             }else{
                 $resultJson = $this->setResult(false,"Process Failed",[]);

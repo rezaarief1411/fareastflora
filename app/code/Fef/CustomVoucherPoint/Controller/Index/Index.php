@@ -95,8 +95,6 @@ class Index extends \Magento\Checkout\Controller\Index\Index implements HttpGetA
         // $updatedAt = date('U', strtotime($observer->getQuote()->getUpdatedAt()));
         // $now = time();
         if($customerSession->getId() && $quote->getId()){
-            // $logger->info("QuoteCollectAfter : ".$quote->getId()." || ".$customerSession->getId());
-
             $voucherPointUsedCollection = $voucherPointUsedFactory->create()
             ->getCollection()
             ->addFieldToFilter('customer_id', $customerSession->getId())

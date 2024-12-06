@@ -63,19 +63,41 @@ class ToOrder
     public function convert(Address $object, $data = [])
     {
         
-        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/cart-coupon.log');
-        $logger = new \Zend_Log();
-        $logger->addWriter($writer);
-        $logger->info("convert");
+        // $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/cart-coupon.log');
+        // $logger = new \Zend_Log();
+        // $logger->addWriter($writer);
+        // $logger->info("convert");
 
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $voucherCalculateTempFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\CalculateTempFactory');
+        $voucherPointUsedFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointUsedFactory');
+        $quoteRepository = $objectManager->get('\Magento\Quote\Api\CartRepositoryInterface');
+        $zokuRewardQuoteFactory = $objectManager->get('\Zoku\Rewards\Model\ResourceModel\Quote');
 
         $orderData = $this->objectCopyService->getDataFromFieldset(
             'sales_convert_quote_address',
             'to_order',
             $object
         );
+
+        $zokuRewardQuoteCollection = $zokuRewardQuoteFactory->loadByQuoteId($object->getQuote()->getId());
+
+        $usedPoints = 0;
+        if(!empty($zokuRewardQuoteCollection)){
+            $usedPoints = $zokuRewardQuoteCollection["reward_points"];
+        }
+
+        
+        $quote = $quoteRepository->get($object->getQuote()->getId());
+        $quoteItems = $quote->getAllItems();
+        $totalTax = 0;
+        foreach ($quoteItems as $_quoteItem) {
+            $quoteItem = $quote->getItemById($_quoteItem->getItemId());
+            $totalTax += $quoteItem->getTaxAmount();
+        }
+
+        // $logger->info("totalTax : $totalTax");
+        
 
         $voucherCalculateTempCollection = $voucherCalculateTempFactory->create()
         ->getCollection()
@@ -84,25 +106,42 @@ class ToOrder
         ->addFieldToFilter('quote_id', $object->getQuote()->getId());
         $voucherCalculateTempData = $voucherCalculateTempCollection->getData();
 
+        $voucherUsedCollection = $voucherPointUsedFactory->create()
+        ->getCollection()
+        ->addFieldToSelect(array("voucher_name"))
+        ->addFieldToFilter('customer_id', $orderData["customer_id"])
+        ->addFieldToFilter('quote_id', $object->getQuote()->getId());
+        $voucherusedData = $voucherUsedCollection->getData();
+
+
         foreach ($voucherCalculateTempData as $voucherCalculateTemp) {
             $tempResultArr = json_decode($voucherCalculateTemp["calculate_result"],true);
+            
+            
 
-            $logger->info("shipping_incl_tax : ".$orderData["shipping_incl_tax"]);
-            // foreach ($tempResultArr as $tempResult) {
-                $shippingAmount = $orderData["shipping_incl_tax"];
-                $orderData["base_subtotal"] =  $tempResultArr['totalNettAmount'] + $shippingAmount;
-                $orderData["subtotal"]= $tempResultArr['totalNettAmount'] + $shippingAmount;
-                $orderData["discount_amount"]= $tempResultArr['totalDiscountAmount'] + $shippingAmount;
-                $orderData["discount_invoiced"]= $tempResultArr['totalDiscountAmount'] + $shippingAmount;
-                $orderData["base_discount_amount"]= $tempResultArr['totalDiscountAmount'] + $shippingAmount;
-                $orderData["base_discount_invoiced"]= $tempResultArr['totalDiscountAmount'] + $shippingAmount;
-                $orderData["grand_total"]= $tempResultArr['totalNettAmount'] + $shippingAmount;
-                $orderData["base_grand_total"]= $tempResultArr['totalNettAmount'] + $shippingAmount;
-            // }
+            // $order = $objectManager->create('Magento\Sales\Model\Order')->load($orderId);
+            // $orderItems = $order->getAllItems();
+
+            $shippingAmount = $orderData["shipping_incl_tax"];
+            $orderData["base_subtotal"] =  $tempResultArr['totalNettAmount'] - $totalTax;
+            $orderData["subtotal"]= $tempResultArr['totalNettAmount'] - $totalTax;
+            $orderData["discount_amount"] = $tempResultArr['totalDiscountAmount'];
+            $orderData["discount_invoiced"] = $tempResultArr['totalDiscountAmount'];
+            $orderData["base_discount_amount"] = $tempResultArr['totalDiscountAmount'];
+            $orderData["base_discount_invoiced"] = $tempResultArr['totalDiscountAmount'];
+            $orderData["grand_total"] = $tempResultArr['totalNettAmount'] + $shippingAmount;
+            $orderData["base_grand_total"] = $tempResultArr['totalNettAmount'] + $shippingAmount;
+            if($usedPoints > 0 && isset($voucherusedData[0]) && $voucherusedData[0]["voucher_name"] != ""){
+                $orderData["discount_description"] =  "Voucher and Redeem Point";
+            }
+            
+            $orderData["discount_tax_compensation_amount"] = 0;
+            $orderData["base_discount_tax_compensation_amount"] = 0;
+            $orderData["shipping_discount_tax_compensation_amount"] = 0;
+            $orderData["base_shipping_discount_tax_compensation_amnt"] = 0;
+
         }
 
-        // $logger2->info("orderData : ".print_r($orderData,true));
-        // $logger->info("data : ".print_r($data,true));
 
         /**
          * @var $order \Magento\Sales\Model\Order

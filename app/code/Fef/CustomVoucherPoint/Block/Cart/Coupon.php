@@ -20,6 +20,7 @@ class Coupon extends \Magento\Checkout\Block\Cart\Coupon
     protected $voucherPointFactory;
     protected $voucherPointUsedFactory;
     protected $checkoutSession;
+    protected $customerSession;
 
     /**
      * @param \Magento\Framework\View\Element\Template\Context $context
@@ -42,6 +43,7 @@ class Coupon extends \Magento\Checkout\Block\Cart\Coupon
             $checkoutSession, 
             $data);
         $this->checkoutSession = $checkoutSession;
+        $this->customerSession = $customerSession;
         $this->voucherPointFactory = $voucherPointFactory;
         $this->voucherPointUsedFactory = $voucherPointUsedFactory;
     }
@@ -73,6 +75,7 @@ class Coupon extends \Magento\Checkout\Block\Cart\Coupon
 
             $listVoucherArr = $voucherPoint->getData();
 
+            $newMemberVocListArray = [];
             foreach ($listVoucherArr as $listVoucher) {
                 $memberVocList = json_decode($listVoucher["member_voucher_list"],true);
                 $newMemberVocListArray = [];
@@ -130,17 +133,9 @@ class Coupon extends \Magento\Checkout\Block\Cart\Coupon
 
     public function isGuest()
     {
-        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/reza-test.log');
-        $logger = new \Zend_Log();
-        $logger->addWriter($writer);
-        $logger->info("isGuest");
-
-        try {
-            $customerId = $this->checkoutSession->getQuote()->getCustomerId();
-        } catch (\Exception $ex) {
-            $logger->info("Exception : ".$ex->getMessage());
+        if($this->customerSession->isLoggedIn()) {
+            return 0;
         }
-
-        return true;
+        return 1;
     }
 }

@@ -37,6 +37,27 @@ define([
         backToShippingMethod: function () {
             sidebarModel.hide();
             stepNavigator.navigateTo('shipping', 'opc-shipping_method');
+        },
+
+        getPureValue: function (type) { 
+            var shippingAddress = quote.shippingAddress();
+            var extAttr = shippingAddress.customAttributes;
+            if (extAttr[type] != undefined) {
+                return extAttr[type];
+            } else { 
+                return 0;
+            }
+            // return extAttr[type];
+        },
+
+        hideTitle: function () { 
+            var discName = this.getPureValue("voucher_name");
+            var discValue = this.getPureValue("voucher_amount");
+
+            if ((discName == "Voucher Name : -" || discName == "Voucher Name : ") && (discValue == "Voucher Type : 0" || discValue == "Voucher Type : $ 0.00")) { 
+                return false;
+            }
+            return true;
         }
     });
 });

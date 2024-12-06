@@ -6,15 +6,28 @@ use \Magento\Checkout\Model\Session as CheckoutSession;
 
 class Rate extends \Magento\Quote\Model\Quote\Address\Rate
 {
+    private $_url;
+    private $_responseFactory;
+    
+    // public function __construct(
+    //     \Magento\Framework\UrlInterface $url, 
+    //     \Magento\Framework\App\ResponseFactory $responseFactory
+    // ) {
+    //     $this->_url = $url;
+    //     $this->_responseFactory = $responseFactory;
+    // }
+
     public function importShippingRate(\Magento\Quote\Model\Quote\Address\RateResult\AbstractResult $rate)
     {
-        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/reza-test.log');
+        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/shipping-rate.log');
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
         // $logger->info("==================================================================");
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
+        $urlInterface = $objectManager->get('\Magento\Framework\UrlInterface');
         $helperData = $objectManager->get('\Fef\CustomShipping\Helper\Data');
+        $request = $objectManager->get('\Magento\Framework\App\RequestInterface');
+
         $token = $helperData->generateToken();
         if($token==""){
             if($helperData->getDebugMode()==1){
@@ -23,48 +36,50 @@ class Rate extends \Magento\Quote\Model\Quote\Address\Rate
         }
 
         $costData = $this->callApi($rate);
-        // $logger->info(print_r($costData,true));
+
         $finalPrice = 0;
+        $isFailed = 0;
+        $failedMessage = "";
         $methodDescription = "<br/>";
+
         if(!empty($costData)){
             $finalPrice = $costData["totalDeliveryCost"];
-            $deliveryCostBreakdown = $costData["deliveryCostBreakdown"];
-            foreach ($deliveryCostBreakdown as $key => $value) {
-                $methodDescription.="$key:$value <br/>";
+            if(isset($costData["deliveryCostBreakdown"])){
+                $deliveryCostBreakdown = $costData["deliveryCostBreakdown"];
+                foreach ($deliveryCostBreakdown as $key => $value) {
+                    $methodDescription.="$key:$value <br/>";
+                }
+            }
+            
+            if ($rate instanceof \Magento\Quote\Model\Quote\Address\RateResult\Error) {
+                $this->setCode(
+                    $rate->getCarrier() . '_error'
+                )->setCarrier(
+                    $rate->getCarrier()
+                )->setCarrierTitle(
+                    $rate->getCarrierTitle()
+                )->setErrorMessage(
+                    $rate->getErrorMessage()
+                );
+            } elseif ($rate instanceof \Magento\Quote\Model\Quote\Address\RateResult\Method) {
+                $this->setCode(
+                    $rate->getCarrier() . '_' . $rate->getMethod()
+                )->setCarrier(
+                    $rate->getCarrier()
+                )->setCarrierTitle(
+                    $rate->getCarrierTitle()
+                )->setMethod(
+                    $rate->getMethod()
+                )->setMethodTitle(
+                    $rate->getMethodTitle()
+                )->setMethodDescription(
+                    $rate->getMethodDescription()
+                )->setPrice(
+                    $finalPrice
+                );
             }
         }
-
         
-        
-
-        if ($rate instanceof \Magento\Quote\Model\Quote\Address\RateResult\Error) {
-            $this->setCode(
-                $rate->getCarrier() . '_error'
-            )->setCarrier(
-                $rate->getCarrier()
-            )->setCarrierTitle(
-                $rate->getCarrierTitle()
-            )->setErrorMessage(
-                $rate->getErrorMessage()
-            );
-        } elseif ($rate instanceof \Magento\Quote\Model\Quote\Address\RateResult\Method) {
-            $this->setCode(
-                $rate->getCarrier() . '_' . $rate->getMethod()
-            )->setCarrier(
-                $rate->getCarrier()
-            )->setCarrierTitle(
-                $rate->getCarrierTitle()
-            )->setMethod(
-                $rate->getMethod()
-            )->setMethodTitle(
-                $rate->getMethodTitle()
-            )->setMethodDescription(
-                $rate->getMethodDescription()
-            )->setPrice(
-                $finalPrice
-            );
-            // $this->setData("aa",1);
-        }
         return $this;
     }
 
@@ -86,6 +101,8 @@ class Rate extends \Magento\Quote\Model\Quote\Address\Rate
             $checkoutQuoteAddressShipping = "standard";
         }
         $deliveryStairs = $checkoutQuote->getData('delivery_stairs');
+
+        $logger->info("deliveryStairs : $deliveryStairs");
         
         $deliverySlot = $checkoutQuote->getData('delivery_timeslot');
         $deliveryDate = $checkoutQuote->getData('delivery_date');
@@ -116,80 +133,46 @@ class Rate extends \Magento\Quote\Model\Quote\Address\Rate
                 "postalCode" => $checkoutQuoteAddress->getPostcode(),
                 "datetime" => $newDate = date("Y-m-d", strtotime($deliveryDate))." ".$deliveryTime,
                 "others" => array(
-                    "staircase" => (int)$deliveryStairs,
+                    "staircase" => $deliveryStairs,
                     "deliveryType" => $checkoutQuoteAddressShipping
                 ),
                 "items" => $paramItems,
             );
             if($helperData->getDebugMode()==1){
                 // $logger->info("url : ".$helperData->getUrl("rate"));
-                // $logger->info("apiParams : ".json_encode($apiParams));
+                $logger->info("apiParams : ".json_encode($apiParams));
             }
+            $resGetRateResult = $helperData->setCurl(
+                $helperData->getUrl("rate"),
+                "POST",
+                $apiParams,
+                1
+            );
 
+            if($helperData->getDebugMode()==1){
+                $logger->info($resGetRateResult);
+            }
             
-            // $modelFefResultFactory = $objectManager->get('\Fef\CustomShipping\Model\FefRateResultFactory');
-            // $modelFefResult = $modelFefResultFactory->create();
-            // $collectionResult = $modelFefResult->load($checkoutQuoteId, 'quote_id');
-            // $dataCollectionResult = $collectionResult->getData();
-
-            // $countData = count($collectionResult->getData());
-            // if($countData==0){
-                $resGetRateResult = $helperData->setCurl(
-                    $helperData->getUrl("rate"),
-                    "POST",
-                    $apiParams,
-                    1
-                );
-
-                if($helperData->getDebugMode()==1){
-                    $logger->info($resGetRateResult);
+            $resGetRateResultArray = json_decode($resGetRateResult,true);
+            // $logger->info("resGetRateResultArray : ".print_r($resGetRateResultArray,true));
+            if($resGetRateResultArray["status"]=="success"){
+                $rateData = $resGetRateResultArray["data"];
+                $this->setAdditionalCost($checkoutQuote,$rateData["deliveryCostBreakdown"]);
+                // return $rateData["totalDeliveryCost"];
+                return $rateData;
+            } else {
+                $message = "failed";
+                if(isset($resGetRateResultArray["data"]["message"])){
+                    $message = $resGetRateResultArray["data"]["message"];
+                }elseif(isset($resGetRateResultArray["data"]["deliveryType"])){
+                    $message = $resGetRateResultArray["data"]["deliveryType"];
                 }
-                
-                // $modelFefResult->setQuoteId($checkoutQuoteId);
-                // $modelFefResult->setRateResultShipping($checkoutQuoteAddressShipping);
-                // $modelFefResult->setApiParams(json_encode($apiParams));
-                // $modelFefResult->setApiResult($resGetRateResult);
-                // $modelFefResult->save();
-
-                $resGetRateResultArray = json_decode($resGetRateResult,true);
-                // $logger->info("resGetRateResultArray : ".print_r($resGetRateResultArray,true));
-                if($resGetRateResultArray["status"]=="success"){
-                    $rateData = $resGetRateResultArray["data"];
-                    $this->setAdditionalCost($checkoutQuote,$rateData["deliveryCostBreakdown"]);
-                    // return $rateData["totalDeliveryCost"];
-                    return $rateData;
-                } else {                    
-                    return [];
-                }
-
-            // } else {
-            //     // $logger->info($checkoutQuoteAddressShipping ." || ".$collectionResult["rate_result_shipping"] ." (".$collectionResult["id"].")");
-            //     if($checkoutQuoteAddressShipping != $collectionResult["rate_result_shipping"]){
-            //         $resGetRateResult = $helperData->setCurl(
-            //             $helperData->getUrl("rate"),
-            //             "POST",
-            //             $apiParams,
-            //             1
-            //         );
-            //         $modelFefResult->setRateResultShipping($rate->getMethod());
-            //         $modelFefResult->setApiParams(json_encode($apiParams));
-            //         $modelFefResult->setApiResult($resGetRateResult);
-            //         $modelFefResult->save();
-
-            //         $resGetRateResultArray = json_decode($resGetRateResult,true);
-            //         if(isset($resGetRateResultArray["data"]["totalDeliveryCost"]) && $resGetRateResultArray["data"]["totalDeliveryCost"]!=""){
-            //             return $resGetRateResultArray["data"]["totalDeliveryCost"];
-            //         }
-            //     } else{
-            //         $apiResult = json_decode($dataCollectionResult["api_result"],true);
-            //         if($apiResult["status"]=="success"){
-            //             return $apiResult["data"]["totalDeliveryCost"];
-            //         }else {
-            //             $logger->info("Failed get shipping rate !");
-            //             return 0;
-            //         }
-            //     }
-            // }
+                return [
+                    "totalDeliveryCost" => 0,
+                    "message" => $message,
+                    "error" => true
+                ];
+            }
         }
     }
 

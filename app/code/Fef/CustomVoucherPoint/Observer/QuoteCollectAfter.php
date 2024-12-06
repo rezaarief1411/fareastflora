@@ -48,10 +48,20 @@ class QuoteCollectAfter implements \Magento\Framework\Event\ObserverInterface
         if(strpos($urlInterface->getCurrentUrl(),"updatePost") != FALSE || strpos($urlInterface->getCurrentUrl(),"updateItemQty") != FALSE
         || strpos($urlInterface->getCurrentUrl(),"totals-information") != FALSE || strpos($urlInterface->getCurrentUrl(),"shipping-information") != FALSE
         || strpos($urlInterface->getCurrentUrl(),"syncemail") != FALSE || strpos($urlInterface->getCurrentUrl(),"points") != FALSE
-        || strpos($urlInterface->getCurrentUrl(),"couponPost") != FALSE){
+        || strpos($urlInterface->getCurrentUrl(),"couponPost") != FALSE || strpos($urlInterface->getCurrentUrl(),"totals?") != FALSE){
             
             try {
                 
+                // if(strpos($urlInterface->getCurrentUrl(),"totals-information") != FALSE){
+                //     $logger->info("START");
+                //     $itemsVisible = $quote->getAllVisibleItems();
+                //     foreach($itemsVisible as $item) {
+                //         $logger->info('ID: '.$item->getProductId());
+                //         $logger->info('Name: '.$item->getName());
+                //         $logger->info('Discount: '.$item->getDiscountAmount());
+                //    }
+                // }
+
                 if($customerSession->getId() && $quote->getId()){
     
                     $customerId = $customerSession->getId();
@@ -77,12 +87,16 @@ class QuoteCollectAfter implements \Magento\Framework\Event\ObserverInterface
                             $customHelper->calculateOrder("",0);
                         }
                     }
+                } else{
+                    $customHelper->calculateOrder("",0);
                 }
 
             } catch (\Exception $ex) {
                 $logger->info($ex->getMessage());
             }
-        }       
+        }
+
+        // $quote->collectTotals()->save();
 
         return $this;
     }

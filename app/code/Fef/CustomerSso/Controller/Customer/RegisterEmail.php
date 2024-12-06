@@ -1,13 +1,5 @@
 <?php
-/**
- * Webkul Software.
- *
- * @category  Webkul
- * @package   Webkul_<modulename>
- * @author    Webkul Software Private Limited
- * @copyright Copyright (c) Webkul Software Private Limited (https://webkul.com)
- * @license   https://store.webkul.com/license.html
- */
+
 namespace Fef\CustomerSso\Controller\Customer;
 
 use Magento\Framework\Controller\ResultFactory;
@@ -38,7 +30,6 @@ class RegisterEmail extends \Magento\Framework\App\Action\Action
     private $customerSession;
     private $customerHelper;
     private $prosellerId;
-
 
 
     /**
@@ -78,16 +69,16 @@ class RegisterEmail extends \Magento\Framework\App\Action\Action
         $modelFefToken = $this->modelFefTokenFactory->create();
 
         
-        
-        try {
+        $registerParams = $this->request->getParams();
+        $email = $registerParams['email'];
+        $otp = $registerParams['register']["otp"];
 
-            $registerParams = $this->request->getParams();
+        try {
 
             // $logger->info("===================== registerParams =======================");
             // $logger->info(print_r($registerParams,true));
             
-            $email = $registerParams['email'];
-            $otp = $registerParams['register']["otp"];
+            
 
             if(isset($registerParams["type"]) && isset($registerParams["type"]) == "resend"){
                 $resultJson = $this->customerHelper->sendOtp($email);
@@ -98,8 +89,8 @@ class RegisterEmail extends \Magento\Framework\App\Action\Action
                      * LAST STEP, VALIDATE OTP THAT HAS INPUT IN FRONTEND
                      */
                     $respOtpArray = $this->customerHelper->validateOtp($email,$otp);
-                    // $logger->info("===================== validateOtp =======================");
-                    // $logger->info(print_r($respOtpArray,true));
+                    $logger->info("===================== validateOtp =======================");
+                    $logger->info(print_r($respOtpArray,true));
 
                     if(isset($respOtpArray["status"]) && $respOtpArray["status"]=="success"){
                         /**
@@ -124,13 +115,35 @@ class RegisterEmail extends \Magento\Framework\App\Action\Action
                         */
                         // $logger->info("===================== update token done =======================");
 
-                    
-                        $this->createCustomerFromRegisterForm($registerParams);
-                        // $logger->info("===================== createCustomerFromRegisterForm =======================");
+                        $phoneNumber = "+".$registerParams["contact_number"].$registerParams["telephone"];
+                        $logger->info("phoneNumber : $phoneNumber");
+
+                        // $arrAttribute = $this->getAttrList($respCreate["data"]["phoneNumber"],$registerParams);
+                        $registerParams["phoneNumber"] = $phoneNumber;
+                        $registerParams["id"] = $_SESSION["prosellerId"];
+                        $registerParams["name"] = $registerParams['firstname']." ".$registerParams['lastname'];
+
+                        $arrAttribute = $this->customerHelper->getAttributeList($registerParams);
+                        $logger->info(print_r($arrAttribute,true));
 
                         $customerRepo = $this->customerRepository->get($email); 
+
+                        $logger->info("id : ".$customerRepo->getId());
+
                         $customer = $this->customerFactory->create()->load($customerRepo->getId());
+
+                        $customer->save();
+
+                        $logger->info("customer save");
+
+                        $addressId = $this->customerHelper->setCustomerAddress($registerParams);
+                        $logger->info("addressId : $addressId");
+                        if($addressId){
+                            $this->customerHelper->updateCustomerAttribute($arrAttribute,$email, $addressId);
+                            $logger->info("updateCustomerAttribute");
+                        }
                         $this->customerSession->setCustomerAsLoggedIn($customer);
+                        $this->customerSession->setUsername($email);
                         
                         $_SESSION["prosellerId"] = '';
                         
@@ -190,6 +203,8 @@ class RegisterEmail extends \Magento\Framework\App\Action\Action
 
                         }else{
 
+                            $logger->info("===================== EMAIL NOT EXIST IN MAGENTO AND EMAIL NOT EXIST IN PROSELLER =======================");
+
                             /**
                              * IF EMAIL NOT EXIST IN MAGENTO AND EMAIL NOT EXIST IN PROSELLER, THEN :
                              * - CREATE PROSELLER MEMBER
@@ -211,6 +226,8 @@ class RegisterEmail extends \Magento\Framework\App\Action\Action
             }
 
         } catch (\Exception $ex) {
+            $logger->info("Exception for validate OTP ($email) : ".$ex->getMessage());
+            
             $resultJson->setData([
                 "message" => ($ex->getMessage()), 
                 "success" => false
@@ -255,11 +272,8 @@ class RegisterEmail extends \Magento\Framework\App\Action\Action
             
             $_SESSION["prosellerId"] = $respCreate["data"]["id"];
             
-            // $logger->info("ID : ".$_SESSION["prosellerId"]);
-
-            $arrAttribute = $this->getAttrList($respCreate["data"]["phoneNumber"]);
             
-            $this->customerHelper->updateCustomerAttribute($arrAttribute,$email);
+            // $this->customerRepository->save($customer);
 
             $arrResult = [
                 "message" => "Customer created successfully to proseller",
@@ -282,35 +296,6 @@ class RegisterEmail extends \Magento\Framework\App\Action\Action
         return $arrResult;
     }
 
-    private function createCustomerFromRegisterForm($params)
-    {
-        
-        $storeId = $this->customerHelper->storemanager->getStore()->getId();        
-        $websiteId = $this->customerHelper->storemanager->getStore($storeId)->getWebsiteId();
-        $customer = $this->customerHelper->customerInterface->create();
-        $phoneNumber = "+".$params["contact_number"].$params["telephone"];
-
-        $email = $params["email"];
-        $firstName = $params["firstname"];
-        $lastName = $params["lastname"];
-
-        $customer->setWebsiteId($websiteId);
-        $customer->setFirstname($firstName);
-        $customer->setLastname($lastName);
-        $customer->setEmail($email);
-        $hashedPassword = $this->customerHelper->encryptInterface->getHash($email, true);
-        $this->customerRepository->save($customer, $hashedPassword);
-
-        if(isset($params["deliveryAddress"])){
-            $this->setCustomerAddressFromRegisterForm($phoneNumber);
-        }
-        
-        $arrAttribute = $this->getAttrList($phoneNumber);
-        $this->customerHelper->updateCustomerAttribute($arrAttribute, $email);
-        $this->customerHelper->reindexCustomer();
-    }
-
-    
     public function getAttrList($phoneNumber)
     {
         // $phoneNumber = "+".$params["contact_number"].$params["telephone"];
@@ -394,50 +379,6 @@ class RegisterEmail extends \Magento\Framework\App\Action\Action
         return $value;
     }
 
-    public function updateAttribute($arrAttribute,$email)
-    {
-        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/customer-register.log');
-        $logger = new \Zend_Log();
-        $logger->addWriter($writer);
-        // $logger->info(print_r($arrAttribute,true));
-
-        foreach ($arrAttribute as $key => $val) {
-            $tableData = [];
-            $customer = $this->getCustomerByEmail($email);
-            $customerId = $customer->getId();
-            $attributeId = $this->eavAttribute->getIdByCode('customer', $arrAttribute[$key]["code"]);
-            // $logger->info("attributeId : $attributeId -> ".$arrAttribute[$key]["code"]);
-            if($attributeId==null){
-                $failedFlag = 1;
-            }else{
-                
-                if($customerId==null){
-                    
-                }else{
-                    $connection = $this->resourceConnection->getConnection();
-                    $table = $connection->getTableName($arrAttribute[$key]["table"]);
-                    $query = "SELECT `value_id`, `value` FROM " . $table." WHERE entity_id = ".$customerId." AND attribute_id = $attributeId";
-                    // $logger->info("query select -> ".$query);
-                    $valueArr = $connection->fetchAll($query);
-                    if(empty($valueArr)){
-                        $tableColumn = ['attribute_id', 'entity_id', 'value'];
-                        $tableData[] = [$attributeId, $customerId, $arrAttribute[$key]["value"]];
-                        // $logger->info(print_r($tableData,true));
-                        $connection->insertArray($table, $tableColumn, $tableData);
-                    } else {
-                        $valueId = $valueArr[0]["value_id"];
-                        $prosellerId = $valueArr[0]["value"];
-                        // if($prosellerId != $dataValue){
-                            $query = "UPDATE `" . $table . "` SET `value`= '".$arrAttribute[$key]["value"]."' WHERE value_id = ".$valueId;
-                            // $logger->info("query update -> ".$query);
-                            $connection->query($query);
-                        // }
-                    }
-                }            
-            }
-        }
-    }
-
     public function deleteCookie($name)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -453,5 +394,6 @@ class RegisterEmail extends \Magento\Framework\App\Action\Action
                 ->setDomain($sessionManager->getCookieDomain())
         );
     }
+
 
 }

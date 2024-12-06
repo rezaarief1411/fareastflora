@@ -57,6 +57,30 @@ define([
         backToShippingMethod: function () {
             sidebarModel.hide();
             stepNavigator.navigateTo('shipping', 'opc-shipping_method');
-        }
+        },
+
+        hideTitle: function () { 
+            var costW = this.getPureValue("cost_weight");
+            var costSc = this.getPureValue("cost_staircase");
+            var costL = this.getPureValue("cost_location");
+            if (costW == 0 && costSc == 0 && costL == 0) {
+                return false;
+            } else if (costW == undefined && costSc == undefined && costL == undefined) { 
+                return false;
+            }
+            return true;
+            
+        },
+
+        getPureValue: function (type) { 
+            var shippingAddress = quote.shippingAddress();
+            var extAttr = shippingAddress.customAttributes;
+            if (extAttr[type] != undefined) {
+                return extAttr[type];
+            } else { 
+                return 0;
+            }
+            
+        },
     });
 });

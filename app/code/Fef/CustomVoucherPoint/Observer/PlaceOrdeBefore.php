@@ -26,9 +26,11 @@ class PlaceOrdeBefore implements \Magento\Framework\Event\ObserverInterface
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $customerSession = $objectManager->get('\Magento\Customer\Model\Session');
         $customHelper = $objectManager->get('\Fef\CustomVoucherPoint\Helper\Data');
+        $quoteFactory = $objectManager->get('\Magento\Quote\Model\QuoteFactory');
+        
         $helperData = $objectManager->get('\Fef\CustomShipping\Helper\Data');
+        $helperDiscount = $objectManager->get('\Fef\CustomVoucherPoint\Helper\Data');
         $voucherPointFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointFactory');
-        $voucherPointUsedFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointUsedFactory');
         $zokuRewardQuoteFactory = $objectManager->get('\Zoku\Rewards\Model\ResourceModel\Quote');
 
         $redeemUrl = $helperData->getConfig("carriers/custom/base_url")."loyalty/redeem";
@@ -37,20 +39,14 @@ class PlaceOrdeBefore implements \Magento\Framework\Event\ObserverInterface
         $customerId = $order->getCustomerId();
         $quoteId = $order->getQuoteId();
 
-        $logger->info("customerId : $customerId || quoteId : $quoteId   ");
+        // $logger->info("PlaceOrdeBefore : ".$order->getIncrementId());
 
-        $voucherPointUsedCollection = $voucherPointUsedFactory->create()
-        ->getCollection()
-        ->addFieldToFilter('customer_id', $customerId)
-        ->addFieldToFilter('quote_id', $quoteId);
-        $voucherUsedData = $voucherPointUsedCollection->getData();
 
+        $voucherUsedData = $helperDiscount->getUsedVoucherPointData($customerId,$quoteId);
         $usedVoucher = "";
         if(count($voucherUsedData) > 0 ){
             $usedVoucher = $voucherUsedData[0]["used_voucher"];
         }
-
-        // $logger->info("usedVoucher : $usedVoucher");
 
         $voucherPoint = $voucherPointFactory->create()
             ->getCollection()
@@ -100,11 +96,33 @@ class PlaceOrdeBefore implements \Magento\Framework\Event\ObserverInterface
             $hitParams["vouchers"] = array();
         }
         
-        $logger->info("hitParamsRedeem : ".print_r($hitParams,true));
-        $logger->info("redeemUrl : $redeemUrl");
-        $logger->info(json_encode($hitParams));
+        // $logger->info("hitParamsRedeem : ".print_r($hitParams,true));
+        // $logger->info("redeemUrl : $redeemUrl");
+        // $logger->info(json_encode($hitParams));
         $applyResponse = $helperData->setCurl($redeemUrl,"POST",$hitParams,1);
-        $logger->info("applyResponse : ".print_r($applyResponse,true));
+        // $logger->info("applyResponse : ".print_r($applyResponse,true));
+
+
+        // $quote = $quoteFactory->create()->load($quoteId);
+
+        // $tempTableData = $helperDiscount->getTempTableDataByCustomerAndQuote($customerId,$quoteId);
+        // $logger->info("tempTableData : ".print_r($tempTableData,true));
+        // $calcResult = json_decode($tempTableData[0]["calculate_result"],true);
+        
+        // $logger->info("calcResult : ".print_r($calcResult,true));
+
+        // $grandTotal = $quote->getGrandTotal();
+        // $newGrandTotal = $calcResult["totalNettAmount"] + ($order->getShippinginclTax());
+
+        // $logger->info("newGrandTotal : $newGrandTotal");
+
+        // $quote->setGrandTotal($newGrandTotal);
+        // $quote->setBaseGrandTotal($newGrandTotal);
+        // $quote->save();
+
+        // $order->setGrandTotal($newGrandTotal);
+        // $order->setBaseGrandTotal($newGrandTotal);
+        // $order->save();
 
         // $logger2->info("PlaceOrdeBefore");
 

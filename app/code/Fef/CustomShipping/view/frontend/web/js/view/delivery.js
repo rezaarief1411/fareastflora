@@ -63,6 +63,8 @@ define([
 
     var popUp = null;
 
+    var localAction = this;
+
     return Component.extend({
         defaults: {
             template: 'Fef_CustomShipping/delivery',
@@ -95,7 +97,7 @@ define([
                 stepNavigator.registerStep(
                     'delivery',
                     null,
-                    $t('Delivery MethodS'),
+                    $t('Delivery Methods'),
                     this.visible, _.bind(this.navigate, this),
                     this.sortOrder
                 );
@@ -309,25 +311,64 @@ define([
                                 'company': address.company,
                                 'telephone': address.telephone,
                                 'fax': address.fax,
+                                'extension_attributes' : address.extension_attributes,
                                 'custom_attributes': address.custom_attributes,
                                 'save_in_address_book': address.save_in_address_book
                             }
                         });
                         var selectShippingMethod;
-                        // console.log(quote);
-                        // console.log(quote.getQuoteId());
 
                         storage.post(serviceUrl, payload, false).
                             done(function (result) {
+                                
                                 selectShippingMethod = result.filter(item => item.method_code !== 'in_store_pickup');
+
+
+                                $.ajax({
+                                    url: '/fef_shipping/ajax/getcost',
+                                    processData: false,
+                                    contentType: false,
+                                    showLoader: false,
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    success: function (response) {
+                                        console.log(response);
+                                        if (response["success"] == true) {
+                                            var obj = $.parseJSON(response["costData"]);
+                                            address['customAttributes']['cost_weight'] = obj["cost_weight"];
+                                            address['customAttributes']['cost_staircase'] = obj["cost_staircase"];
+                                            address['customAttributes']['cost_location'] = obj["cost_location"];
+                                            address['customAttributes']['voucher_name'] = "Voucher Name : " + obj["voucher_name"];
+                                            address['customAttributes']['voucher_amount'] = "Voucher Type : " + obj["voucher_amount"];
+                    
+                                            // console.log(abstractTotal);
+                                            // console.log(defaulRender);
+                                        } else { 
+                                            address['customAttributes']['cost_weight'] = 0;
+                                            address['customAttributes']['cost_staircase'] = 0;
+                                            address['customAttributes']['cost_location'] = 0;
+                                            address['customAttributes']['voucher_name'] = "Voucher Name : -";
+                                            address['customAttributes']['voucher_amount'] = "Voucher Type : 0";
+                                        }
+                                        // $('.cost-information .cost-to .shipping-information-content').load(self);
+                                        stepNavigator.next();
+                                    },
+                                    fail: function (response) {
+                                        console.log("failed");
+                                        console.log(response);
+                                        stepNavigator.next();
+                                    }
+                                });
+
                                 rateRegistry.set(address.getKey(), selectShippingMethod);
                                 shippingService.setShippingRates(selectShippingMethod);
+                                
                             }).fail(function(response) {
                                 console.log(response);
                             }
                         );
 
-                        stepNavigator.next();
+                        // stepNavigator.next();
                     }
                 );
             }
@@ -339,6 +380,8 @@ define([
 
             var $deliveryNote = $('textarea[name="delivery_note"]');
             var note = $deliveryNote.val();
+
+            localAction = this;
 
             if (note == '') {
                 $deliveryNote.parent().find('.field-error').remove();
@@ -373,22 +416,30 @@ define([
                 return false;
             }
 
+            // if (!$("select[name='delivery_stairs']").find(":selected").val()) {
+            //     this.errorValidationMessage(
+            //         $t('The building level is missing. Please fill the building level and try again.')
+            //     );
+            //     this.focusInvalid();
+            //     return false;
+            // }
+
             
-            if (!$("input[name='delivery_stairs']").first().val()) {
-                this.errorValidationMessage(
-                    $t('The building level is missing. Please fill the building level and try again.')
-                );
-                this.focusInvalid();
-                return false;
-            } else {
-                if (!$.isNumeric($("input[name='delivery_stairs']").first().val())) { 
-                    this.errorValidationMessage(
-                        $t('The building level must in number format. Please change the value and try again.')
-                    );
-                    this.focusInvalid();
-                    return false;
-                }
-            }
+            // if (!$("input[name='delivery_stairs']").first().val()) {
+            //     this.errorValidationMessage(
+            //         $t('The building level is missing. Please fill the building level and try again.')
+            //     );
+            //     this.focusInvalid();
+            //     return false;
+            // } else {
+            //     if (!$.isNumeric($("input[name='delivery_stairs']").first().val())) { 
+            //         this.errorValidationMessage(
+            //             $t('The building level must in number format. Please change the value and try again.')
+            //         );
+            //         this.focusInvalid();
+            //         return false;
+            //     }
+            // }
 
             if (!quote.shippingMethod()) {
                 this.errorValidationMessage(
@@ -420,6 +471,42 @@ define([
             if (this.source.get('shippingAddress.custom_attributes')) {
                 this.source.trigger('shippingAddress.custom_attributes.data.validate');
             }
+        },
+
+        /**
+         * call API 
+         */
+        checkDelivery: function () { 
+            console.log("checkDelivery");
+            var $spanNotice = $('#message-notice');
+            if (this.validateShippingInformation()) { 
+                $.ajax({
+                    url: '/fef_shipping/ajax/getdelivery',
+                    showLoader: true,
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function (response) {
+                        console.log(response);
+                        if (response["success"] == true) {
+                            $spanNotice.hide();
+                            $('#opc-continue').show();
+                        } else { 
+                            $('#opc-continue').hide();
+                            $spanNotice.show();
+                            localAction.errorValidationMessage(
+                                $t(response.message)
+                            );
+                            return false;
+                            
+                        }
+                    },
+                    fail: function (response) {
+                        $('#opc-continue').hide();
+                        console.log(response);
+                    }
+                });
+            }
         }
+            
     });
 });

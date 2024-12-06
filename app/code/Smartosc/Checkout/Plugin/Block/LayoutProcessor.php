@@ -158,12 +158,7 @@ class LayoutProcessor
         \Closure $proceed,
         array $jsLayout
     ) {
-
-        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/reza-test.log');
-        $logger = new \Zend_Log();
-        $logger->addWriter($writer);
-        $logger->info("masuk layout vendor");
-
+        
         $jsLayoutResult = $proceed($jsLayout);
 
         if ($this->getQuote()->isVirtual()) {
@@ -994,7 +989,6 @@ class LayoutProcessor
     public function getSpecialDisableDate()
     {
         $arrSpecialDate = $this->specialDate->getSpecialDisableDate();
-        $this->_logger->info('Disable date in admin: ' .  $this->jsonHelper->jsonEncode($arrSpecialDate));
         foreach ($arrSpecialDate as $key => $item) {
             $arrSpecialDate[$key] = strtotime($item);
         }

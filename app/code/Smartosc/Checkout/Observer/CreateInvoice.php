@@ -165,6 +165,7 @@ class CreateInvoice implements ObserverInterface
                     $transactionSave = $this->transactionFactory->create()->addObject($invoice)->addObject($invoice->getOrder());
                     $transactionSave->save();
                     $this->logger->info('Create invoice for order ' . $order->getIncrementId() . ' successfully.');
+                    $invoice->setDiscountAmount($order->getDiscountAmount(0));
                     try {
                         if ($this->salesData->canSendNewInvoiceEmail()) {
                             $invoice->setSendEmail(true);

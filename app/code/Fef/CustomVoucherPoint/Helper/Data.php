@@ -86,36 +86,39 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         
         $details = [];
         $configurables = array();
-        foreach($itemsVisible as $item){
-            $productId = $item->getProduct()->getId();
-            // $logger->info("productId : $productId, sku : ".$item->getProduct()->getSku());
-
-            if ($item->getHasChildren() ) {
-                foreach ($item->getChildren() as $child) {
-                    $item_s = $productObject->load($child->getProduct()->getId());
-                    // $logger->info("childId : ".$child->getProduct()->getId().", sku : ".$child->getSku().", proseller ID : ".$item_s->getProsellerId());
+        if(count($itemsVisible)>0){
+            foreach($itemsVisible as $item){
+                $productId = $item->getProduct()->getId();
+                // $logger->info("productId : $productId, sku : ".$item->getProduct()->getSku());
+    
+                if ($item->getHasChildren() ) {
+                    foreach ($item->getChildren() as $child) {
+                        $item_s = $productObject->load($child->getProduct()->getId());
+                        // $logger->info("childId : ".$child->getProduct()->getId().", sku : ".$child->getSku().", proseller ID : ".$item_s->getProsellerId());
+                        $details[] = array(
+                            "productId"=>$item_s->getProsellerId(),
+                            "quantity"=>$item->getQty(),
+                            "unitPrice"=>$child->getProduct()->getFinalPrice(),
+                            "discount"=>$child->getProduct()->getDiscount() == NULL ? 0 : $child->getProduct()->getDiscount(),
+                            "modifiers"=> array()
+                        );
+                        // $logger->info(print_r($details,true));
+                    }
+                }else{
+                    $item_s = $productObject->load($productId);
                     $details[] = array(
                         "productId"=>$item_s->getProsellerId(),
                         "quantity"=>$item->getQty(),
-                        "unitPrice"=>$child->getProduct()->getFinalPrice(),
-                        "discount"=>$child->getProduct()->getDiscount() == NULL ? 0 : $child->getProduct()->getDiscount(),
+                        "unitPrice"=>$item_s->getFinalPrice(),
+                        "discount"=>$item_s->getDiscount() == NULL ? 0 : $item_s->getDiscount(),
                         "modifiers"=> array()
-                    );
-                    // $logger->info(print_r($details,true));
+                    );    
                 }
-            }else{
-                $item_s = $productObject->load($productId);
-                $details[] = array(
-                    "productId"=>$item_s->getProsellerId(),
-                    "quantity"=>$item->getQty(),
-                    "unitPrice"=>$item_s->getFinalPrice(),
-                    "discount"=>$item_s->getDiscount() == NULL ? 0 : $item_s->getDiscount(),
-                    "modifiers"=> array()
-                );    
+    
+                            
             }
-
-                        
         }
+        
         return $details;
     }
 
@@ -157,6 +160,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function calculateOrder($voucherId, $pointsParams = null, $details = array())
     {
+
+        // app/code/Zoku/Rewards/Model/Calculation.php => for calculation refference 
+        
+
         $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/cart-coupon.log');
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
@@ -166,8 +173,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $outletId = $this->helper->getConfig("carriers/custom/outlet_id");
         $calculateUrl = $this->helper->getUrl("cal");
         
-        $customer = $this->customerRepository->getById($this->customerSession->getId());
-        $prosellerMemberId = $customer->getCustomAttribute('proseller_member_id');
+        if($this->customerSession->getId()){
+            $customer = $this->customerRepository->getById($this->customerSession->getId());
+            $prosellerMemberId = $customer->getCustomAttribute('proseller_member_id')->getValue();
+        }else{
+            $prosellerMemberId = "3237c0f7-c31a-4f71-bdaf-8c9917772d03";
+        }
+        
+
+        
 
         // $logger->info("outletId : $outletId || prosellerMemberId : ".$prosellerMemberId->getValue());
         if(empty($details)){
@@ -220,21 +234,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $hitParams = array(
             "outletId" => $outletId,
-            "customerId" => $prosellerMemberId->getValue() ? $prosellerMemberId->getValue() : "",
+            "customerId" => $prosellerMemberId,
             "details" => $details,
             "loyalty" => $loyalty
         );
         
         $applyResponse = $this->helper->setCurl($calculateUrl,"POST",$hitParams,1);
 
+        
+
         $arrCalculateResp = json_decode($applyResponse,true);
 
+        // $logger->info("url : ".$calculateUrl);
+        // $logger->info("hitParams : ".json_encode($hitParams));
         // $logger->info("hitParams : ".print_r($hitParams,true));
-        // $logger->info("applyResponse : ".print_r($arrCalculateResp,true));
+        // $logger->info("applyResponse : ".$applyResponse);
+        // $logger->info("arrCalculateResp : ".print_r($arrCalculateResp,true));
+        
 
         if(isset($arrCalculateResp) && $arrCalculateResp["status"] == "success"){
 
-            
 
             $this->saveToTempTable($arrCalculateResp["data"]);
             
@@ -247,7 +266,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $this->updateQuoteData($arrCalculateResp["data"]);
                 return array(
                     "success"=>"true",
-                    "message" => "valid"
+                    "message" => $arrCalculateResp["data"]
                 );
             }
         }else{
@@ -313,28 +332,38 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $countItems = count($quoteItems);
 
         $x = 0;
-        $totalDisc = 0;
+        $totalDiscPoint = 0;
+        foreach ($data["details"] as $details) {
+            if(isset($details["discountType"]) && $details["discountType"] == "POINTS"){
+                $totalDiscPoint += $details["totalDiscAmount"];
+            }
+        }
+        
 
-        if(isset($data["details"][$x])){
-            
+        if(isset($data["details"][$x])){            
+            $totalTax = 0;
             foreach ($quoteItems as $_quoteItem) {
                 $quoteItem = $quote->getItemById($_quoteItem->getItemId());
-
-                
-
-                $countChild = count($quoteItem->getChildren());
-
-                $startChildKey = $countItems - $countChild;
-                // $logger->info("startChildKey : $startChildKey");
+                $totalTax += $quoteItem->getTaxAmount();
 
                 if ($quoteItem->getHasChildren() ) {
-                    $quoteItem->setRowTotal($data["totalNettAmount"]);
-                    $quoteItem->setRowTotalInclTax($data["totalTaxableAmount"]);
-                    $quoteItem->setBaseRowTotal($data["totalNettAmount"] - $quoteItem->getTaxAmount());
+                    // $quoteItem->setRowTotal($data["totalNettAmount"]);
+                    $quoteItem->setRowTotal(($data["nettAmount"] - $quoteItem->getTaxAmount()) < 0 ? 0 : $data["nettAmount"] - $quoteItem->getTaxAmount());
+                    $quoteItem->setRowTotalInclTax($data["totalNettAmount"]);
+                    // $quoteItem->setBaseRowTotal($data["totalNettAmount"] - $quoteItem->getTaxAmount());
+                    $quoteItem->setBaseRowTotal(($data["nettAmount"] - $quoteItem->getTaxAmount() ) < 0 ? 0 : $data["nettAmount"] - $quoteItem->getTaxAmount());
                     $quoteItem->setBaseRowTotalInclTax($data["totalNettAmount"]);
-                    $quoteItem->setDiscountAmount($data["totalDiscountAmount"]);
-                    $quoteItem->setBaseDiscountAmount($data["totalDiscountAmount"]);
-                    $quoteItem->setRowTotalWithDiscount($data["totalGrossAmount"]);
+                    if(isset($data["pointsDiscount"])){
+                        $quoteItem->setDiscountAmount($data["totalDiscAmount"] + $data["pointsDiscount"]["nettAmount"]);
+                        $quoteItem->setBaseDiscountAmount($data["totalDiscAmount"] + $data["pointsDiscount"]["nettAmount"]);
+                    }else{
+                        $quoteItem->setDiscountAmount($data["totalDiscountAmount"]);
+                        $quoteItem->setBaseDiscountAmount($data["totalDiscountAmount"]);
+                    }
+
+                    // $quoteItem->setRowTotalWithDiscount($data["totalGrossAmount"]);
+                    $quoteItem->setRowTotalWithDiscount($data["nettAmount"] + $data["totalDiscAmount"]);
+
                 }else{
                     // $logger->info("_quoteItem->getItemId : ".$_quoteItem->getItemId());
 
@@ -350,11 +379,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     // $quoteItem->setBaseRowTotalInclTax($data["details"][$x]["grossAmount"] - $data["details"][$x]["lineDiscAmount"]);
                     $quoteItem->setBaseRowTotalInclTax($data["details"][$x]["nettAmount"]);
 
-                    // $quoteItem->setDiscountAmount($data["details"][$x]["lineDiscAmount"]);
-                    $quoteItem->setDiscountAmount($data["details"][$x]["totalDiscAmount"]);
+                    if(isset($data["details"][$x]["pointsDiscount"])){
+                        $quoteItem->setDiscountAmount($data["details"][$x]["totalDiscAmount"] + $data["details"][$x]["pointsDiscount"]["nettAmount"]);
+                        $quoteItem->setBaseDiscountAmount($data["details"][$x]["totalDiscAmount"]  + $data["details"][$x]["pointsDiscount"]["nettAmount"]);
+                    }else{
+                        $quoteItem->setDiscountAmount($data["details"][$x]["totalDiscAmount"]);
+                        $quoteItem->setBaseDiscountAmount($data["details"][$x]["totalDiscAmount"]);
+                    }
 
-                    // $quoteItem->setBaseDiscountAmount($data["details"][$x]["lineDiscAmount"]);
-                    $quoteItem->setBaseDiscountAmount($data["details"][$x]["totalDiscAmount"]);
+                    
+                    // $quoteItem->setDiscountAmount($data["details"][$x]["totalDiscAmount"] + $totalDiscPoint);
+
+                    
+                    // $quoteItem->setBaseDiscountAmount($data["details"][$x]["totalDiscAmount"] + $totalDiscPoint);
+
+                    // TEMPORARY
+                    // $quoteItem->setDiscountAmount($quoteItem->getDiscountAmount() + $data["details"][$x]["totalDiscAmount"]);
+                    // $quoteItem->setBaseDiscountAmount($quoteItem->getDiscountAmount() + $data["details"][$x]["totalDiscAmount"]);
 
                     // $quoteItem->setRowTotalWithDiscount($data["details"][$x]["nettAmount"] + $data["details"][$x]["lineDiscAmount"]);
                     $quoteItem->setRowTotalWithDiscount($data["details"][$x]["nettAmount"] + $data["details"][$x]["totalDiscAmount"]);
@@ -369,39 +410,59 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         
         $shippingAddress = $quote->getShippingAddress();
+
+        $logger->info("after update quote data : $qid : ".$shippingAddress->getDiscountDescription());
+
         $shippingAmount = $shippingAddress->getShippingInclTax();
-        $shippingAddress->setBaseSubtotal($data["totalNettAmount"] + $shippingAmount);
-        $shippingAddress->setBaseSubtotalTotalInclTax($data["totalNettAmount"] + $shippingAmount);
-        $shippingAddress->setSubtotal($data["totalNettAmount"] + $shippingAmount);
-        $shippingAddress->setSubtotalInclTax($data["totalNettAmount"] + $shippingAmount);
-        $shippingAddress->setBaseSubtotalInclTax($data["totalNettAmount"] + $shippingAmount);
-        $shippingAddress->setSubtotalWithDiscount($data["totalNettAmount"] + $shippingAmount);
-        $shippingAddress->setBaseSubtotalWithDiscount($data["totalNettAmount"] + $data["totalDiscountAmount"] + $shippingAmount);
-        $shippingAddress->setDiscountAmount($data["totalDiscountAmount"] + $shippingAmount);
-        $shippingAddress->setBaseDiscountAmount($data["totalDiscountAmount"] + $shippingAmount);
+        $shippingAddress->setBaseSubtotal($data["totalNettAmount"] - $totalTax);
+        $shippingAddress->setBaseSubtotalTotalInclTax($data["totalNettAmount"] - $totalTax);
+        $shippingAddress->setSubtotal($data["totalNettAmount"] - $totalTax);
+        $shippingAddress->setSubtotalInclTax($data["totalNettAmount"]);
+        $shippingAddress->setBaseSubtotalInclTax($data["totalNettAmount"]);
+        $shippingAddress->setSubtotalWithDiscount($data["totalNettAmount"]);
+        $shippingAddress->setBaseSubtotalWithDiscount($data["totalNettAmount"] - $data["totalDiscountAmount"]);
+        $shippingAddress->setDiscountAmount($data["totalDiscountAmount"]);
+        $shippingAddress->setBaseDiscountAmount($data["totalDiscountAmount"]);
         $shippingAddress->setBaseGrandTotal($data["totalNettAmount"] + $shippingAmount);
         $shippingAddress->setGrandTotal($data["totalNettAmount"] + $shippingAmount);
+
+        $shippingAddress->setDiscountTaxCompensationAmount(0);
+        $shippingAddress->setBaseDiscountTaxCompensationAmount(0);
+        $shippingAddress->setShippingDiscountTaxCompensationAmount(0);
+        $shippingAddress->setBaseShippingDiscountTaxCompensationAmnt(0);
+
+        // $shippingAddress->setDiscountDescription("Test");
         $shippingAddress->save();
+
         
-        $logger->info("updateQuoteData : ".$quote->getId());
 
     }
 
     private function saveToTempTable($respData)
     {
+
+        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/cart-coupon.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+
+        
+
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();   
         $CalculateTempFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\CalculateTempFactory');
         $voucherPointUsedFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointUsedFactory');
 
         $CalculateTemp = $CalculateTempFactory->create();
-        $customerId = $this->customerSession->getId();
         $quoteId = $this->checkoutSession->getQuote()->getId();
+        $customerId = $this->customerSession->getId();
+        
+        // $CalculateTempCollection = $CalculateTemp
+        //     ->getCollection()
+        //     ->addFieldToFilter('customer_id', $customerId)
+        //     ->addFieldToFilter('quote_id', $quoteId);
+        // $dataCollection = $CalculateTempCollection->getData();
 
-        $CalculateTempCollection = $CalculateTemp
-            ->getCollection()
-            ->addFieldToFilter('customer_id', $customerId)
-            ->addFieldToFilter('quote_id', $quoteId);
-        $dataCollection = $CalculateTempCollection->getData();
+        $dataCollection = $this->getTempTableDataByCustomerAndQuote($customerId, $quoteId);
+        
 
         if(count($dataCollection) > 0){
             foreach ($dataCollection as $key => $collection) {
@@ -414,10 +475,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $voucherPointUsed = $voucherPointUsedFactory->create();
-        $voucherPointUsedCollection = $voucherPointUsed->getCollection()
-        ->addFieldToFilter('customer_id', $customerId)
-        ->addFieldToFilter('quote_id', $quoteId);
-        $datavoucherPointUsedCollection = $voucherPointUsedCollection->getData();
+        // $voucherPointUsedCollection = $voucherPointUsed->getCollection()
+        // ->addFieldToFilter('customer_id', $customerId)
+        // ->addFieldToFilter('quote_id', $quoteId);
+        // $datavoucherPointUsedCollection = $voucherPointUsedCollection->getData();
+
+        $datavoucherPointUsedCollection = $this->getUsedVoucherPointData($customerId, $quoteId);
+        
+        
         if(count($dataCollection) > 0){
             foreach ($datavoucherPointUsedCollection as $key => $voucherPointUsedCollection) {
                 $id = $voucherPointUsedCollection["id"];
@@ -452,7 +517,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();   
         $voucherPointFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointFactory');
-        $voucherPointUsedFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointUsedFactory');
+        // $voucherPointUsedFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointUsedFactory');
 
         $voucherPoint = $voucherPointFactory->create();
         
@@ -461,12 +526,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             ->addFieldToFilter('customer_id', $customerId);
         $dataCollection = $voucherPointCollection->getData();
 
-        $voucherPointUsed = $voucherPointUsedFactory->create();
-        $voucherPointUsedCollection = $voucherPointUsed
-            ->getCollection()
-            ->addFieldToFilter('customer_id',array('eq' => $customerId))
-            ->addFieldToFilter('quote_id',array('eq' => $qid));
-        $dataUsedCollection = $voucherPointUsedCollection->getData();
+        
+        // $voucherPointUsed = $voucherPointUsedFactory->create();
+        // $voucherPointUsedCollection = $voucherPointUsed
+        //     ->getCollection()
+        //     ->addFieldToFilter('customer_id',array('eq' => $customerId))
+        //     ->addFieldToFilter('quote_id',array('eq' => $qid));
+        // $dataUsedCollection = $voucherPointUsedCollection->getData();
+
+        $dataUsedCollection = $this->getUsedVoucherPointData($customerId,$qid);
 
         $usedVoucher = "";
         if(count($dataUsedCollection)>0){
@@ -545,7 +613,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $savedAmount = $pointAmount;
             $comment = "updated point from proseller";
 
-            $logger->info("comment : ".$comment." || $savedAmount");
+            // $logger->info("comment : ".$comment." || $savedAmount");
 
             if($savedAmount != NULL && $resultData[0]['points_left'] != NULL){
                 try {
@@ -565,6 +633,41 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $logger->info($comment." to $customerId with amount $savedAmount");
             }
         }
+    }
+
+    public function getTempTableDataByCustomerAndQuote($customerId, $quoteId)
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();   
+        $CalculateTempFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\CalculateTempFactory');
+        $CalculateTempCollection = $CalculateTempFactory->create()
+            ->getCollection()
+            ->addFieldToFilter('customer_id', $customerId)
+            ->addFieldToFilter('quote_id', $quoteId);
+        $dataCollection = $CalculateTempCollection->getData();
+        return $dataCollection;
+    }
+
+    public function getTempTableDataByCustomer($customerId)
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();   
+        $CalculateTempFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\CalculateTempFactory');
+        $CalculateTempCollection = $CalculateTempFactory->create()
+            ->getCollection()
+            ->addFieldToFilter('customer_id', $customerId)->getLastItem();
+        $dataCollection = $CalculateTempCollection->getData();
+        return $dataCollection;
+    }
+
+    public function getUsedVoucherPointData($customerId, $quoteId)
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $voucherPointUsedFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointUsedFactory');
+        $voucherPointUsedCollection = $voucherPointUsedFactory->create()
+            ->getCollection()
+            ->addFieldToFilter('customer_id', $customerId)
+            ->addFieldToFilter('quote_id', $quoteId);
+        $datavoucherPointUsedCollection = $voucherPointUsedCollection->getData();
+        return $datavoucherPointUsedCollection;
     }
 
 

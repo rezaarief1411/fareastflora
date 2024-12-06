@@ -46,9 +46,6 @@ class SavePickUpInOrder implements \Magento\Framework\Event\ObserverInterface
         $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/reza-test.log');
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
-        $logger->info("Save");
-        $logger->info("OK");
-
         /** @var \Magento\Sales\Api\Data\OrderInterface $order */
         $order = $observer->getEvent()->getOrder();
 

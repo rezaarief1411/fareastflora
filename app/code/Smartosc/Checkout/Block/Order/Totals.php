@@ -174,6 +174,8 @@ class Totals extends \Magento\Sales\Block\Order\Totals
                 ]
             );
         }
+
+        $logger->info(print_r($this->_totals,true));
         return $this;
     }
 }

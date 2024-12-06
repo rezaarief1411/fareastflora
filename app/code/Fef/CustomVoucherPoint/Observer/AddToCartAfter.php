@@ -18,10 +18,9 @@ class AddToCartAfter implements \Magento\Framework\Event\ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
 
-        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/cart-coupon.log');
+        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/reza-test.log');
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
-        $logger->info("AddToCartAfter");
 
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $customerSession = $objectManager->get('\Magento\Customer\Model\Session');

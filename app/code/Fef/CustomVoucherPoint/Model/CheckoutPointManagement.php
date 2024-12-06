@@ -55,10 +55,10 @@ class CheckoutPointManagement implements \Fef\CustomVoucherPoint\Api\CheckoutPoi
      */
     public function set($cartId, $usedPoints)
     {
-        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/reza-test.log');
+        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/cart-coupon.log');
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
-        $logger->info("set point");
+        $logger->info("set point for cartId : $cartId");
 
         if (!$usedPoints || $usedPoints < 0) {
             throw new LocalizedException(__('Points "%1" not valid.', $usedPoints));
@@ -74,6 +74,8 @@ class CheckoutPointManagement implements \Fef\CustomVoucherPoint\Api\CheckoutPoi
 
         $pointsLeft = $this->rewardsRepository->getCustomerRewardBalance($quote->getCustomerId());
 
+        // $logger->info("usedPoints : $usedPoints, minPoints : $minPoints, pointsLeft : $pointsLeft");
+
         if ($minPoints && $pointsLeft < $minPoints) {
             throw new LocalizedException(
                 __('You need at least %1 points to pay for the order with reward points.', $minPoints)
@@ -85,13 +87,38 @@ class CheckoutPointManagement implements \Fef\CustomVoucherPoint\Api\CheckoutPoi
                 throw new LocalizedException(__('Too much point(s) used.'));
             }
 
+            // $logger->info("quote ".$quote->getId()." grand total 1 : ".$quote->getGrandTotal());
+
             $pointsData = $this->limitValidate($quote, $usedPoints);
             $usedPoints = abs($pointsData['allowed_points']);
             $itemsCount = $quote->getItemsCount();
 
             if ($itemsCount) {
-                $this->collectCurrentTotals($quote, $usedPoints);
 
+                $resp = $this->calculcateOrder($quote->getId(), $usedPoints);
+                // $logger->info("resp : ".print_r($resp,true));
+                $newUsedPoint = 0;
+                $newUsedAmount = 0;
+
+                if(isset($resp["message"]["details"])){
+                    $details = $resp["message"]["details"];
+                    foreach ($details as $resDetails) {
+                        if(isset($resDetails["pointsDiscount"])){
+                            $newUsedPoint += $resDetails["pointsDiscount"]["used"];
+                            $newUsedAmount += $resDetails["pointsDiscount"]["nettAmount"];
+                        }        
+                    }
+                }
+                if($newUsedPoint==0){
+                    $newUsedPoint = $usedPoints;
+                }
+
+                // $logger->info("newUsedPoint : ".$newUsedPoint." || $newUsedAmount");
+
+                // $this->collectCurrentTotals($quote, $usedPoints);
+                $this->collectCurrentTotals($quote, $newUsedPoint, $newUsedAmount);
+
+                // $logger->info("quote grand total 2 : ".$quote->getGrandTotal());
                 $this->rewardsQuote->addReward(
                     $quote->getId(),
                     $quote->getData('zokurewards_point')
@@ -102,7 +129,9 @@ class CheckoutPointManagement implements \Fef\CustomVoucherPoint\Api\CheckoutPoi
         }
 
         
-        $resp = $this->calculcateOrder($quote->getId(),$quote->getData('zokurewards_point'));
+        // $resp = $this->calculcateOrder($quote->getId(),$quote->getData('zokurewards_point'));
+        // $logger->info("resp : ".print_r($resp,true));
+
         if($resp["success"]=="false"){
             throw new NoSuchEntityException(__('%1', $resp["message"]));
         }else{
@@ -116,10 +145,13 @@ class CheckoutPointManagement implements \Fef\CustomVoucherPoint\Api\CheckoutPoi
     /**
      * {@inheritdoc}
      */
-    public function collectCurrentTotals(\Magento\Quote\Model\Quote $quote, $usedPoints)
+    public function collectCurrentTotals(\Magento\Quote\Model\Quote $quote, $usedPoints, $usedAmount = 0)
     {
         $quote->getShippingAddress()->setCollectShippingRates(true);
         $quote->setData('zokurewards_point', $usedPoints);
+        if($usedAmount!=0){
+            $quote->setData('zokurewards_amount', $usedAmount);
+        }
         $quote->setDataChanges(true);
         $quote->collectTotals();
         $this->quoteRepository->save($quote);
@@ -172,7 +204,6 @@ class CheckoutPointManagement implements \Fef\CustomVoucherPoint\Api\CheckoutPoi
         $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/reza-test.log');
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
-        $logger->info("remove point");
         
         /** @var  \Magento\Quote\Model\Quote $quote */
         $quote = $this->quoteRepository->getActive($cartId);
@@ -199,18 +230,20 @@ class CheckoutPointManagement implements \Fef\CustomVoucherPoint\Api\CheckoutPoi
         $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/cart-coupon.log');
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
-        $logger->info("calculcateOrder : $usedPoints points");
+        // $logger->info("calculcateOrder : $usedPoints points");
 
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();   
         $customerSession = $objectManager->get('\Magento\Customer\Model\Session');
         $customHelper = $objectManager->get('\Fef\CustomVoucherPoint\Helper\Data');
-        $voucherPointUsedFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointUsedFactory');
+        
+        // $voucherPointUsedFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointUsedFactory');
+        // $voucherPointUsedCollection = $voucherPointUsedFactory->create()
+        // ->getCollection()
+        // ->addFieldToFilter('customer_id', $customerSession->getId())
+        // ->addFieldToFilter('quote_id', $quoteId);
+        // $voucherUsedData = $voucherPointUsedCollection->getData();
 
-        $voucherPointUsedCollection = $voucherPointUsedFactory->create()
-        ->getCollection()
-        ->addFieldToFilter('customer_id', $customerSession->getId())
-        ->addFieldToFilter('quote_id', $quoteId);
-        $voucherUsedData = $voucherPointUsedCollection->getData();
+        $voucherUsedData = $customHelper->getUsedVoucherPointData($customerSession->getId(), $quoteId);
 
         $usedVoucher = "";
         if(count($voucherUsedData) > 0 ){

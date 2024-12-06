@@ -65,22 +65,17 @@ define([
                     console.log(response);
                     if (response["success"] == true) {
                         var obj = $.parseJSON(response["costData"]);
-                        shippingAddress['customAttributes']['cost_weight'] = "Cost Weight : " + obj["cost_weight"];
-                        shippingAddress['customAttributes']['cost_location'] = "Cost Location : " + obj["cost_location"];
+                        shippingAddress['customAttributes']['cost_weight'] = obj["cost_weight"];
+                        shippingAddress['customAttributes']['cost_staircase'] = obj["cost_staircase"];
+                        shippingAddress['customAttributes']['cost_location'] = obj["cost_location"];
                         shippingAddress['customAttributes']['voucher_name'] = "Voucher Name : " + obj["voucher_name"];
                         shippingAddress['customAttributes']['voucher_amount'] = "Voucher Type : " + obj["voucher_amount"];
-                        // shippingAddress['customAttributes']['cost_item_spesific'] = "Cost Item Spesific : " + obj["cost_item_spesific"];
-                        // shippingAddress['customAttributes']['cost_staircase'] = "Cost Staircase : " + obj["cost_staircase"];
-                        // shippingAddress['customAttributes']['cost_period'] = "Cost Period : " + obj["cost_period"];
                     } else { 
-                        console.log("false");
-                        shippingAddress['customAttributes']['cost_weight'] = "Cost Weight : -";
-                        shippingAddress['customAttributes']['cost_location'] = "Cost Location : -";
+                        shippingAddress['customAttributes']['cost_weight'] = 0;
+                        shippingAddress['customAttributes']['cost_staircase'] = 0;
+                        shippingAddress['customAttributes']['cost_location'] = 0;
                         shippingAddress['customAttributes']['voucher_name'] = "Voucher Name : -";
                         shippingAddress['customAttributes']['voucher_amount'] = "Voucher Type : 0";
-                        // shippingAddress['customAttributes']['cost_item_spesific'] = "Cost Item Spesific : -";
-                        // shippingAddress['customAttributes']['cost_staircase'] = "Cost Staircase : -";
-                        // shippingAddress['customAttributes']['cost_period'] = "Cost Period : -";
                     }
                     $('.cost-information .cost-to .shipping-information-content').load(self);
                 },

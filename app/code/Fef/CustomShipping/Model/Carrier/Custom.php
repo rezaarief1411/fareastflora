@@ -107,13 +107,14 @@ class Custom extends AbstractCarrier implements CarrierInterface
                 "name" => "standard",
                 "title" => "Standard Delivery",
                 "price" => 0
-            ),
-            array(
-                "method_code" => "express",
-                "name" => "express",
-                "title" => "Express Delivery",
-                "price" => 0
             )
+            // ,
+            // array(
+            //     "method_code" => "express",
+            //     "name" => "express",
+            //     "title" => "Express Delivery",
+            //     "price" => 0
+            // )
         );
     }
 

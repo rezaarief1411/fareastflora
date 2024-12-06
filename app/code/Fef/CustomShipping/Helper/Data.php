@@ -162,6 +162,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $header
         );
         $result = curl_exec($ch);
+        // $logger->info($result);
         return $result;
     }
 

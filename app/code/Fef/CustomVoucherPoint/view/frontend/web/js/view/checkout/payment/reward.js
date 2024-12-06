@@ -59,7 +59,6 @@ define([
          * Coupon code application procedure
          */
         apply: function () {
-            console.log("appply");
             //call ajax to hit get point API -> create controller too
             //controller creation is to sync proseller point to magento (zoku) purpose
             //controller update the point after call api get point

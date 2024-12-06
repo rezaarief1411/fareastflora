@@ -39,7 +39,6 @@ define(
             ).fail(
                 function (response) {
                     isLoading(false);
-                    //var error = JSON.parse(response.responseText);
                 }
             );
         }

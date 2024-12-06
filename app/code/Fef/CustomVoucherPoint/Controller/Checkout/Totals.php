@@ -44,7 +44,7 @@ class Totals extends \Magento\Framework\App\Action\Action
         $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/cart-coupon.log');
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
-        
+        $logger->info("totals");
 
         $response = [
             'errors' => false,
@@ -54,6 +54,8 @@ class Totals extends \Magento\Framework\App\Action\Action
 
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
             $total = $objectManager->get('\Magento\Quote\Model\Quote\Address\Total');
+            $fefHelper = $objectManager->get('\Fef\CustomVoucherPoint\Helper\Data');
+            
             
             //Trigger to re-calculate totals
             $payment = $this->_helper->jsonDecode($this->getRequest()->getContent());

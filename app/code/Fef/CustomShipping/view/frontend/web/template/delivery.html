@@ -55,15 +55,15 @@ role="presentation">
             </div>
             <div role="alert"
                  if="errorValidationMessage().length"
-                 class="message notice">
+                 class="message notice"
+                 id="message-notice">
                 <span text="errorValidationMessage()" />
             </div>
 
-
             <!-- ko if: isAllowNextAction() -->
-                <div class="actions-toolbar" id="shipping-method-buttons-container">
+                <div class="actions-toolbar" id="shipping-method-buttons-container" style="display: flex;float: right;margin-top: 12px;">
                     <div class="primary">
-                        <button data-role="opc-continue" type="submit" class="button action continue primary">
+                        <button data-role="opc-continue" id="opc-continue" type="submit" class="button action continue primary">
                             <span translate="'Next'" />
                         </button>
                     </div>

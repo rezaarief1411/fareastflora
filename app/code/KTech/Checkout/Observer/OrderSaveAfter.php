@@ -61,8 +61,6 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
         $helper = $objectManager->get('\Fef\CustomVoucherPoint\Helper\Data');
         $order = $observer->getEvent()->getOrder();
 
-        
-
         $dataOrder = [];
         $order = $observer->getEvent()->getOrder();
         $status = $order->getStatus();
@@ -188,9 +186,11 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
 
         $nettAmountAll = 0;
 
-        $dataOrder['totalMembershipDiscountAmount'] = $productPriceAndAmount["totalMembershipDiscountAmount"];
-
-        
+        if(isset($productPriceAndAmount["totalMembershipDiscountAmount"])){
+            $dataOrder['totalMembershipDiscountAmount'] = $productPriceAndAmount["totalMembershipDiscountAmount"];    
+        }else{
+            $dataOrder['totalMembershipDiscountAmount'] = 0;
+        }        
 
         // $logger->info("productPriceAndAmount : ".print_r($productPriceAndAmount,true));
 
@@ -371,7 +371,12 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
         $zokuRewardQuoteFactory = $objectManager->get('\Zoku\Rewards\Model\ResourceModel\Quote');
         
 
-        $customerId = $order->getCustomerId();
+        if($order->getCustomerIsGuest()){
+            $customerId = 0;
+        }else{
+            $customerId = $order->getCustomerId();
+        }
+        
         $quoteId = $order->getQuoteId();
 
         $logger->info("customerId & quoteId : $customerId || $quoteId");
@@ -403,7 +408,7 @@ class OrderSaveAfter implements \Magento\Framework\Event\ObserverInterface
             $dataCalculateTemp["details"] = $dataCalculateTempLineItem;
         }
         
-        $logger->info("dataCalculateTemp : ".print_r($dataCalculateTemp,true));
+        // $logger->info("dataCalculateTemp : ".print_r($dataCalculateTemp,true));
 
         return $dataCalculateTemp;
     }

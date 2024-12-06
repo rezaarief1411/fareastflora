@@ -44,8 +44,6 @@ class GetCost extends \Magento\Framework\App\Action\Action
         $storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
         $voucherPointUsedFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointUsedFactory');
 
-        
-
         try {
             $currSym = $storeManager->getStore()->getBaseCurrency()->getCurrencySymbol();
             
@@ -74,12 +72,14 @@ class GetCost extends \Magento\Framework\App\Action\Action
             $checkoutQuote = $checkoutSession->getQuote();
             // $logger->info(print_r($checkoutQuote->getData(),true));
             $arrResult = array(
-                "cost_weight"=>$currSym.$checkoutQuote->getData('cost_weight'),
-                "cost_location"=>$currSym.$checkoutQuote->getData('cost_location'),
+                "cost_weight"=>$checkoutQuote->getData('cost_weight'),
+                "cost_location"=>$checkoutQuote->getData('cost_location'),
+                // "cost_location"=>5,
+                "cost_staircase"=>$checkoutQuote->getData('cost_staircase'),
                 "voucher_name"=>$voucherName,
                 "voucher_amount"=>$voucherAmount,
                 // "cost_item_spesific"=>$currSym.$checkoutQuote->getData('cost_item_spesific'),
-                // "cost_staircase"=>$currSym.$checkoutQuote->getData('cost_staircase'),
+                
                 // "cost_period"=>$currSym.$checkoutQuote->getData('cost_period'),
                 // "cost_delivery_type"=>$currSym.$checkoutQuote->getData('cost_delivery_type'),
             );

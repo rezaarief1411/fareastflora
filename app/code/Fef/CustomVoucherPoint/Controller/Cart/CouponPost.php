@@ -79,20 +79,21 @@ class CouponPost extends \Magento\Checkout\Controller\Cart implements HttpPostAc
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
 
-        // $logger->info("copun post");
+        
 
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();   
         $voucherPointUsedFactory = $objectManager->get('\Fef\CustomVoucherPoint\Model\VoucherPointUsedFactory');
 
         //set kolom used_voucher dari table proseller_voucher_point_used
-
-        $logger->info(print_r($this->getRequest()->getParams(),true));
+        // $logger->info(print_r($this->getRequest()->getParams(),true));
         $couponCodeParams = $this->getRequest()->getParam('remove') == 1
             ? ''
             : trim($this->getRequest()->getParam('proseller_voucher'));
 
-        // $logger->info("couponCodeParams : $couponCodeParams");
+        $logger->info("params : ".print_r($this->getRequest()->getParams(),true));
 
+        $cartQuote = $this->cart->getQuote();
+        $logger->info("cartQuoteId : ".$cartQuote->getId());
         $couponCodeArr = explode('|',$couponCodeParams);
         $couponCode= $couponCodeArr[0];
         $couponName= isset($couponCodeArr[1]) ? $couponCodeArr[1] : "";
@@ -108,7 +109,7 @@ class CouponPost extends \Magento\Checkout\Controller\Cart implements HttpPostAc
 
         $codeLength = strlen($couponCode);
 
-        $customerId = $this->checkoutSession->getQuote()->getCustomerId();
+        $customerId = $cartQuote->getCustomerId();
         
 
         try {
@@ -116,7 +117,7 @@ class CouponPost extends \Magento\Checkout\Controller\Cart implements HttpPostAc
             $voucherPointUsed = $voucherPointUsedFactory->create();
             $voucherPointUsedCollection = $voucherPointUsed->getCollection()
             ->addFieldToFilter('customer_id', $customerId)
-            ->addFieldToFilter('quote_id', $this->checkoutSession->getQuote()->getId());
+            ->addFieldToFilter('quote_id', $cartQuote->getId());
 
             $dataCollection = $voucherPointUsedCollection->getData();
 
@@ -139,11 +140,11 @@ class CouponPost extends \Magento\Checkout\Controller\Cart implements HttpPostAc
                 
                 if($result["success"]=="false"){
                     $couponCode = "";
-                    $this->_checkoutSession->getQuote()->setCouponCode("")->save();
+                    $cartQuote->setCouponCode("")->save();
                     $this->messageManager->addErrorMessage(__($result["message"]));
                 }else{
                     $escaper = $this->_objectManager->get(\Magento\Framework\Escaper::class);
-                    $this->_checkoutSession->getQuote()->setCouponCode($couponCode)->save();
+                    $cartQuote->setCouponCode($couponCode)->save();
                     $this->messageManager->addSuccessMessage(
                         __(
                             'You used voucher "%1".',
@@ -152,8 +153,18 @@ class CouponPost extends \Magento\Checkout\Controller\Cart implements HttpPostAc
                     );
                 }
             }else{
+                // $quoteItems = $cartQuote->getAllItems();
+                // foreach ($quoteItems as $quoteItem) {
+                //     $itemId = $quoteItem->getItemId();
+                //     $logger->info("itemId : ".$itemId);
+                //     $item = $cartQuote->getItemById($itemId);
+                //     $item->setDiscountAmount(0);
+                //     $item->save();
+                    
+                // }
+
                 $this->customVoucherHelper->unapplyVoucher($couponCode);
-                $this->_checkoutSession->getQuote()->setCouponCode("")->save();
+                $cartQuote->setCouponCode("")->save();
                 $this->messageManager->addSuccessMessage(__('You canceled the voucher.'));
             }
 

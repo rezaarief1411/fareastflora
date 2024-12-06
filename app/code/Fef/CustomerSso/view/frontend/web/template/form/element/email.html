@@ -241,10 +241,13 @@
                 </div>
                 <div class="field note margin-bottom10"  id="checkout-register-validation-info" style="background-color:#edd8a1;display:none">Please input OTP that has been sent in your email.</div>
                 <div class="field note margin-bottom10"  id="checkout-register-validation-error" style="color:red"></div>
-
+                
                 <div class="actions-toolbar">
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <button data-bind="click: navigateToNextStep" type="button" class="btn btn-continue btn-link">
+                                <span data-bind="i18n: 'Continue as guest'"></span>
+                            </button>
                             <button type="submit" class="btn btn-primary" id="checkout-btn-register">Create an account</button>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">

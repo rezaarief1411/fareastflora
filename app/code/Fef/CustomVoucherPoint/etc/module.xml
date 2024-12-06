@@ -10,6 +10,7 @@
             <module name="KTech_Checkout"/>
             <module name="Smartosc_Checkout"/>
             <module name="Smartosc_CustomBundleProduct"/>
+            <module name="Magento_Tax"/>
         </sequence>
     </module>
 </config>

@@ -1,10 +1,17 @@
 <?php 
+
 namespace Fef\CustomShipping\Plugin;
+
+use Magento\Framework\Controller\ResultFactory;
 
 class CheckoutLayoutProcessor
 {
     public function afterProcess(\Magento\Checkout\Block\Checkout\LayoutProcessor $subject, $result)
     {
+
+        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/reza-test.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
 
         $deliveryStepUiComponent = &$result['components']['checkout']['children']['steps']['children']['delivery-step'];
 
@@ -13,10 +20,15 @@ class CheckoutLayoutProcessor
         $deliveryStepUiComponent['children']['deliveryContent']['children']['delivery_slot']['children']['delivery_slot']['placeholder'] = __('Please select timeslot');
         $deliveryStepUiComponent['children']['deliveryContent']['children']['delivery_slot']['sortOrder'] = 5;
         
-        $deliveryStairsAttributes = $this->getDeliveryStairsAttributes();
-        $deliveryStepUiComponent['children']['deliveryContent']['children']['delivery_stairs'] = $this->getAdditionalDeliveryComponent($deliveryStairsAttributes,'delivery-stairs');
-        $deliveryStepUiComponent['children']['deliveryContent']['children']['delivery_stairs']['children']['delivery_stairs']['placeholder'] = __('Enter building level');
-        $deliveryStepUiComponent['children']['deliveryContent']['children']['delivery_stairs']['sortOrder'] = 6;
+        $deliveryStairsOptions = $this->getDeliveryStairsOption();
+        // $logger->info(print_r($deliveryStairsOptions,true));
+
+        if(!empty($deliveryStairsOptions)){
+            $deliveryStairsAttributes = $this->getDeliveryStairsAttributes($deliveryStairsOptions);
+            $deliveryStepUiComponent['children']['deliveryContent']['children']['delivery_stairs'] = $this->getAdditionalDeliveryComponent($deliveryStairsAttributes,'delivery-stairs');
+            $deliveryStepUiComponent['children']['deliveryContent']['children']['delivery_stairs']['children']['delivery_stairs']['placeholder'] = __('Enter building level');
+            $deliveryStepUiComponent['children']['deliveryContent']['children']['delivery_stairs']['sortOrder'] = 6;   
+        }
 
         return $result;
     }
@@ -36,8 +48,6 @@ class CheckoutLayoutProcessor
             ],
             "options" => [
                 ['value' => '', 'label' => __('Please select timeslot')]
-                // ['value' => '08:00 - 14:00', 'label' => __('08:00 - 14:00')],
-                // ['value' => '14:00 - 18:00', 'label' => __('14:00 - 18:00')]
             ]
         ]);
 
@@ -48,22 +58,35 @@ class CheckoutLayoutProcessor
      /**
      * @return array
      */
-    private function getDeliveryStairsAttributes()
+    private function getDeliveryStairsAttributes($deliveryStairsOptions)
     {
-        
-        $elements['delivery_stairs']=$this->addFieldToLayout('delivery_stairs', [
-            'dataType' => 'text',
-            'formElement' => 'input',
-            'label' => "Enter a building level",
-            'additionalClasses' => 'delivery_stairs',
-            'id' => 'delivery_stairs',
+        $options = [];
+        // $deliveryStairsOptions = $this->getDeliveryStairsOption();
+
+        $options[0] = [
+            'value' => '', 
+            'label' => __('Please select building level')
+        ];
+        $k = 1;
+        foreach ($deliveryStairsOptions as $key => $value) {
+            $options[$k] = [
+                'value' => $value, 
+                'label' => __($value)
+            ];
+            $k++;
+        }
+
+        $elements['delivery_stairs'] = $this->addFieldToLayout('delivery_stairs', [
+            'dataType' => 'select',
+            'formElement' => 'select',
             'sortOrder' => 26,
             'validation' => [
-                'required-entry' => false
+                'required-entry' => true
             ],
-            'value' => ''
+            "options" => $options
         ]);
 
+        
 
         return $elements;
     }
@@ -119,5 +142,47 @@ class CheckoutLayoutProcessor
             'visible' => true,
             'value' => ''
         ], $customField);
+    }
+
+    private function getDeliveryStairsOption()
+    {
+        $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/reza-test.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $helper = $objectManager->get("\Fef\CustomShipping\Helper\Data");
+        $outletId = $helper->getConfig("carriers/custom/outlet_id");
+
+
+        $dataBuilding = [];
+        try {
+
+            $url = $helper->getConfig("carriers/custom/base_url")."delivery-provider/custom-fields/default";
+            $resGetBuildingResult = $helper->setCurl($url,"GET",null,1);
+
+            $resGetBuildingResultArray = json_decode($resGetBuildingResult,true);
+
+            // $logger->info("resGetBuildingResultArray : ".print_r($resGetBuildingResultArray,true));
+
+            if($resGetBuildingResultArray["status"]=="success"){
+                if($resGetBuildingResultArray["data"]["customFields"]){
+                    $customFields = $resGetBuildingResultArray["data"]["customFields"];
+                    foreach ($customFields as $key => $value) {
+                        if($value["value"]=="staircase"){
+                            $dataBuilding = $value["options"];
+                        }
+                    }
+                }
+            }
+
+            // $logger->info("dataBuilding : ".print_r($dataBuilding,true));
+            
+        } catch (\Exception $ex) {
+            $logger->info("exception : ".$ex->getMessage());
+        }
+
+        return $dataBuilding;
+        
     }
 }

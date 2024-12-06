@@ -35,6 +35,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public $customerInterface;
     private $resultFactory;
 
+    /**
+     * @var \Magento\Framework\Stdlib\Cookie\PhpCookieManager
+     */
+
     public function __construct(
         Http $request,
         CustomHelper $helper,
@@ -79,7 +83,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             null,
             1
         );
-        $logger->info($getByEmailResponse);
         $respArray = json_decode($getByEmailResponse,1);
         return $respArray;
     }
@@ -218,21 +221,41 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $memberProsellerId = $cattrValue ? $cattrValue->getValue() : null;
     }
     
-    public function updateCustomerAttribute($arrAttribute,$email)
+    public function updateCustomerAttribute($arrAttribute,$email, $addressId = null)
     {
         $writer = new \Zend_Log_Writer_Stream(BP.'/var/log/customer-login.log');
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
         // $logger->info(print_r($arrAttribute,true));
-
+        $failedFlag = 0;
         foreach ($arrAttribute as $key => $val) {
             $tableData = [];
             $customer = $this->getCustomerByEmail($email);
             $customerId = $customer->getId();
             $attributeId = $this->eavAttribute->getIdByCode('customer', $arrAttribute[$key]["code"]);
-            // $logger->info("attributeId : $attributeId -> ".$arrAttribute[$key]["code"]);
+
             if($attributeId==null){
                 $failedFlag = 1;
+                $attributeId = $this->eavAttribute->getIdByCode('customer_address', $arrAttribute[$key]["code"]);
+                if($attributeId==null || $attributeId==""){
+                    $failedFlag = 1;
+                }else{
+                    if($addressId!=null){
+                        $connection = $this->resourceConnection->getConnection();
+                        $table = $connection->getTableName($arrAttribute[$key]["table"]);
+                        $query = "SELECT `value_id`, `value` FROM " . $table." WHERE entity_id = ".$addressId." AND attribute_id = $attributeId";
+                        $valueArr = $connection->fetchAll($query);
+                        if(empty($valueArr)){
+                            $tableColumn = ['attribute_id', 'entity_id', 'value'];
+                            $tableData[] = [$attributeId, $addressId, $arrAttribute[$key]["value"]];
+                            $connection->insertArray($table, $tableColumn, $tableData);
+                        } else {
+                            $valueId = $valueArr[0]["value_id"];
+                            $query = "UPDATE `" . $table . "` SET `value`= '".$arrAttribute[$key]["value"]."' WHERE value_id = ".$valueId;
+                            $connection->query($query);
+                        } 
+                    }         
+                }
             }else{
                 
                 if($customerId==null){
@@ -241,21 +264,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $connection = $this->resourceConnection->getConnection();
                     $table = $connection->getTableName($arrAttribute[$key]["table"]);
                     $query = "SELECT `value_id`, `value` FROM " . $table." WHERE entity_id = ".$customerId." AND attribute_id = $attributeId";
-                    // $logger->info("query select -> ".$query);
                     $valueArr = $connection->fetchAll($query);
                     if(empty($valueArr)){
                         $tableColumn = ['attribute_id', 'entity_id', 'value'];
                         $tableData[] = [$attributeId, $customerId, $arrAttribute[$key]["value"]];
-                        // $logger->info(print_r($tableData,true));
                         $connection->insertArray($table, $tableColumn, $tableData);
                     } else {
                         $valueId = $valueArr[0]["value_id"];
                         $prosellerId = $valueArr[0]["value"];
-                        // if($prosellerId != $dataValue){
-                            $query = "UPDATE `" . $table . "` SET `value`= '".$arrAttribute[$key]["value"]."' WHERE value_id = ".$valueId;
-                            // $logger->info("query update -> ".$query);
-                            $connection->query($query);
-                        // }
+                        $query = "UPDATE `" . $table . "` SET `value`= '".$arrAttribute[$key]["value"]."' WHERE value_id = ".$valueId;
+                        $connection->query($query);
                     }
                 }            
             }
@@ -277,22 +295,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $customer = $this->customerInterface->create();
 
         $email = $params["email"];
-        $arrFullName = explode(" ",$params["name"]) ;
+        $arrFullName = explode(" ",$params["name"]);
         $firstName = $arrFullName[0];
         $lastName = $firstName;
         if(isset($arrFullName[1]) && $arrFullName[1] != ""){
             $lastName = $arrFullName[1];
         }
+        // $dobValidate = $params["dob-validate"];
+        // $arrDobValidate = explode("/",$params["dob-validate"]);
         $customer->setWebsiteId($websiteId);
         $customer->setFirstname($firstName);
         $customer->setLastname($lastName);
         $customer->setEmail($email);
+        // $customer->setDob($arrDobValidate[2]."-".$arrDobValidate[0]."-".$arrDobValidate[1]);
         $hashedPassword = $this->encryptInterface->getHash($email, true);
         $this->customerRepository->save($customer, $hashedPassword);
 
-        if(isset($params["deliveryAddress"])){
-            $this->setCustomerAddress($params);
-        }
+        // if(isset($params["deliveryAddress"])){
+        //     $this->setCustomerAddress($params);
+        // }
+        $this->setCustomerAddress($params);
         $arrAttribute = $this->getAttributeList($params);
         // $logger->info("===================== getAttributeList =======================");
         // $logger->info(print_r($arrAttribute,true));
@@ -334,36 +356,39 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $address = $addresss->create();
 
         $postalCode = "";
-        if(isset($params["deliveryAddress"]["postalCode"])){
-            $postalCode = $params["deliveryAddress"]["postalCode"];
+        if(isset($params["postcode"])){
+            $postalCode = $params["postcode"];
         }
 
-        $postalCode = "";
-        if(isset($params["deliveryAddress"]["postalCode"])){
-            $postalCode = $params["deliveryAddress"]["postalCode"];
+        $countryId = "SG";
+        if(isset($params["country_id"])){
+            $countryId = $params["country_id"];
         }
 
         $city = "";
-        if(isset($params["deliveryAddress"]["city"])){
-            $city = $params["deliveryAddress"]["city"];
+        if(isset($params["city"])){
+            $city = $params["city"];
         }
 
         $streetName = "";
-        if(isset($params["deliveryAddress"]["streetName"])){
-            $streetName = $params["deliveryAddress"]["streetName"];
+        if(isset($params["street"])){
+            $streetName = $params["street"][0];
         }
-
         $address->setCustomerId($customerId)
         ->setFirstname($firstName)
         ->setLastname($lastName)
+        ->setCompany($params["company"])
         ->setPostcode($postalCode)
         ->setCity($city)
         ->setTelephone($params["phoneNumber"])
         ->setStreet($streetName)
-        ->setIsDefaultBilling('1')
-        ->setIsDefaultShipping('1')
+        ->setCountryId($countryId)
+        ->setIsDefaultBilling($params["default_billing"])
+        ->setIsDefaultShipping($params["default_shipping"])
         ->setSaveInAddressBook('1');
         $address->save();
+
+        return $address->getId();
     }
 
     public function getAttributeList($params)
@@ -378,6 +403,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 "code"  => "phone_number",
                 "table" => "customer_entity_varchar",
                 "value" => $params["phoneNumber"]
+            ),
+            array(
+                "code"  => "floor",
+                "table" => "customer_address_entity_text",
+                "value" => isset($params["floor"]) ? $params["floor"] : ""
+            ),
+            array(
+                "code"  => "building",
+                "table" => "customer_address_entity_text",
+                "value" => isset($params["building"]) ? $params["building"] : ""
+            ),
+            array(
+                "code"  => "country_phone_code",
+                "table" => "customer_entity_text",
+                "value" => isset($params["country_phone_code"]) ? $params["country_phone_code"] : ""
             )
         );
         return $arrAttribute;
@@ -427,4 +467,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $resultData;
     }
+
+    
 }
